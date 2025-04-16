@@ -19,6 +19,7 @@ interface AuthContextType {
   user: User | null;
   login: (token: string) => void;
   logout: () => void;
+  loading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -26,6 +27,7 @@ export const AuthContext = createContext<AuthContextType>({
   user: null,
   login: () => {},
   logout: () => {},
+  loading: false,
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -47,10 +49,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     if (token) {
       if (isTokenExpired(token)) {
         logout();
+        setLoading(false);
       } else {
         try {
           const decoded: any = jwtDecode(token);
@@ -58,9 +63,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         } catch (err) {
           setUser(null);
         }
+        setLoading(false);
       }
     } else {
       setUser(null);
+      setLoading(false);
     }
   }, [token]);
 
@@ -76,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ token, user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

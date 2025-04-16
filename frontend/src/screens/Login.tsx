@@ -17,7 +17,7 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://192.168.1.207:8080/auth";
+const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
 
 export const loginUser = async (username: string, password: string) => {
   try {
@@ -45,13 +45,25 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate email format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    if (!password || password.trim().length === 0) {
+      alert("Password cannot be empty.");
+      return;
+    }
+
     try {
       const token = await loginUser(email, password);
-      login(token);
 
+      login(token);
       navigate("/");
     } catch (err) {
-      console.error("Login failed", err);
+      alert("Login failed. Please check your credentials.");
     }
   };
 
