@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +17,7 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://172.18.10.106:8080/auth";
+const API_URL = "http://192.168.1.207:8080/auth";
 
 export const loginUser = async (username: string, password: string) => {
   try {
@@ -48,7 +47,6 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       const token = await loginUser(email, password);
-      console.log("Token received:", token);
       login(token);
 
       navigate("/");

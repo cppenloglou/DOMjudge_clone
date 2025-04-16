@@ -25,8 +25,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { AuthContext } from "../context/AuthContext";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function Navbar() {
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -146,7 +157,10 @@ export function Navbar() {
                       >
                         Settings
                       </a>
-                      <button className="text-left text-sm text-muted-foreground hover:text-foreground">
+                      <button
+                        className="text-left text-sm text-muted-foreground hover:text-foreground"
+                        onClick={handleLogout}
+                      >
                         Logout
                       </button>
                     </div>
@@ -270,7 +284,7 @@ export function Navbar() {
                 <a href="/settings">Settings</a>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

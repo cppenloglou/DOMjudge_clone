@@ -36,15 +36,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   );
   const [user, setUser] = useState<User | null>(null);
 
+  // Function to check if the token is expired
+  const isTokenExpired = (token: string) => {
+    try {
+      const decoded: any = jwtDecode(token);
+      const expiry = decoded?.exp * 1000; // Convert expiry to milliseconds
+      return expiry < Date.now();
+    } catch (err) {
+      return true; // If there's an error decoding, consider it expired
+    }
+  };
+
   useEffect(() => {
     if (token) {
-      console.log("Token:", token);
-      try {
-        const decoded: any = jwtDecode(token);
-        setUser(decoded); // or selectively extract fields
-      } catch (err) {
-        console.error("Invalid token:", err);
-        setUser(null);
+      if (isTokenExpired(token)) {
+        logout();
+      } else {
+        try {
+          const decoded: any = jwtDecode(token);
+          setUser(decoded);
+        } catch (err) {
+          setUser(null);
+        }
       }
     } else {
       setUser(null);
@@ -53,12 +66,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const login = (newToken: string) => {
     setToken(newToken);
-    console.log("New token:", newToken);
     localStorage.setItem("token", newToken);
   };
 
   const logout = () => {
     setToken(null);
+    setUser(null);
     localStorage.removeItem("token");
   };
 

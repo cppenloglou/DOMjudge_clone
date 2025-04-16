@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Award } from "lucide-react";
 import { useState } from "react";
 
-const API_URL = "http://172.18.10.106:8080/auth";
+const API_URL = "http://192.168.1.207:8080/auth";
 
 export const registerUser = async (username: string, password: string) => {
   try {
