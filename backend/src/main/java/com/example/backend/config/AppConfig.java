@@ -1,6 +1,6 @@
 package com.example.backend.config;
 
-import com.example.backend.entity.UserRepository;
+import com.example.backend.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

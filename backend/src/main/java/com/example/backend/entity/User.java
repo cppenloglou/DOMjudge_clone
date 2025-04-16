@@ -31,7 +31,11 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @ElementCollection
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
+    @OneToOne
+    private Team team;
+
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
     @Override

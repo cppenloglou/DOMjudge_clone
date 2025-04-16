@@ -4,7 +4,7 @@ package com.example.backend.service;
 import com.example.backend.dto.LoginDto;
 import com.example.backend.dto.RegisterDto;
 import com.example.backend.entity.User;
-import com.example.backend.entity.UserRepository;
+import com.example.backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

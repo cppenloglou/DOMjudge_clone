@@ -36,7 +36,14 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
-                auth.requestMatchers("/auth/login", "/auth/register", "/auth/refresh", "/hello")
+                auth.requestMatchers("/auth/login"
+                                , "/auth/register",
+                                "/auth/refresh",
+                                "/hello",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/v3/api-docs/**",
+                                "/api-ui")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -49,7 +56,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://172.18.15.201:5173"));
+        configuration.setAllowedOrigins(List.of("http://172.18.15.201:5173", "http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

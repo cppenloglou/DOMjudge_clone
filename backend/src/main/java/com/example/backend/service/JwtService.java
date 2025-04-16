@@ -1,5 +1,7 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.User;
+import com.example.backend.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,16 +14,22 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class JwtService {
 
     private static final long ACCESS_TOKEN_TTL = 5 * 60 * 1000;
     private static final long REFRESH_TOKEN_TTL = 7 * 24 * 3600 * 1000;
+    private final UserRepository userRepository;
     @Value("${rsaPrivateKey}")
     private String rsaPrivateKey;
     @Value("${rsaPublicKey}")
     private String rsaPublicKey;
+
+    public JwtService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public PrivateKey generatePrivateKey() {
         try {
@@ -47,11 +55,19 @@ public class JwtService {
 
     public String generateJwtToken(String username) {
         long expirationDate = System.currentTimeMillis() + ACCESS_TOKEN_TTL;
+
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) throw new RuntimeException("User not found");
+
+        User user = userOptional.get();
+
         return Jwts
             .builder()
             .header().type("JWT").and()
             .subject(username)
             .claim("type", "access_token")
+            .claim("id", user.getId())
             .issuedAt(currentDate())
             .expiration(new Date(expirationDate))
             .signWith(generatePrivateKey()).compact();
@@ -59,11 +75,17 @@ public class JwtService {
 
     public String generateRefreshToken(String username) {
         long expirationDate = System.currentTimeMillis() + REFRESH_TOKEN_TTL;
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) throw new RuntimeException("User not found");
+
+        User user = userOptional.get();
         return Jwts
            .builder()
             .header().type("JWT").and()
             .subject(username)
             .claim("type", "refresh_token")
+            .claim("id", user.getId())
             .issuedAt(currentDate())
             .expiration(new Date(expirationDate))
             .signWith(generatePrivateKey()).compact();
