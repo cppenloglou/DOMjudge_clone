@@ -15,9 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Award } from "lucide-react";
 import { useState } from "react";
 
-const API_URL = "http://192.168.1.207:8080/auth";
+const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
 
-export const registerUser = async (username: string, password: string) => {
+export const registerUser = async (
+  username: string,
+  password: string,
+  team: string
+) => {
   try {
     const response = await axios.post(
       `${API_URL}/register`,
@@ -36,16 +40,42 @@ export const registerUser = async (username: string, password: string) => {
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
+  const [team, setTeam] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Basic form validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Invalid email format.");
+      return;
+    }
+
+    if (!team || team.trim() === "") {
+      alert("Team name is required.");
+      return;
+    }
+
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
     try {
-      const token = await registerUser(email, password);
+      await registerUser(email, password, team);
+      alert("Registration successful!");
       navigate("/login");
     } catch (err) {
-      console.error("Register failed", err);
+      alert("Registration failed. Please try again.");
     }
   };
 
@@ -83,9 +113,10 @@ export default function RegisterPage() {
               <Label htmlFor="email">Team Name</Label>
               <Input
                 id="team"
-                placeholder="m@example.com"
                 required
                 type="email"
+                value={team}
+                onChange={(e) => setTeam(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -104,7 +135,13 @@ export default function RegisterPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Confirm Password</Label>
               </div>
-              <Input id="password" required type="password" />
+              <Input
+                id="password"
+                required
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
