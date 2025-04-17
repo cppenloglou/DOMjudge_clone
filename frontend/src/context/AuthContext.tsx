@@ -8,10 +8,10 @@ import React, {
 } from "react";
 import { jwtDecode } from "jwt-decode";
 
-interface User {
+export interface User {
   id: string;
   email: string;
-  // any other fields you store in the JWT
+  hasRegisteredTeam: boolean | null | undefined;
 }
 
 interface AuthContextType {
@@ -20,6 +20,7 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   loading: boolean;
+  setUser: (user: User) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -28,6 +29,7 @@ export const AuthContext = createContext<AuthContextType>({
   login: () => {},
   logout: () => {},
   loading: false,
+  setUser: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -52,38 +54,48 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
+    if (token && !user) {
       if (isTokenExpired(token)) {
         logout();
-        setLoading(false);
       } else {
-        try {
-          const decoded: any = jwtDecode(token);
-          setUser(decoded);
-        } catch (err) {
-          setUser(null);
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const parsedUser = JSON.parse(userStr);
+          setUser(parsedUser);
         }
-        setLoading(false);
       }
-    } else {
-      setUser(null);
-      setLoading(false);
     }
+    setLoading(false);
   }, [token]);
 
-  const login = (newToken: string) => {
-    setToken(newToken);
-    localStorage.setItem("token", newToken);
+  const login = (data: any) => {
+    setLoading(true);
+    const token = data.accessToken;
+    const newUser: User = {
+      id: data.user.id,
+      email: data.user.email,
+      hasRegisteredTeam: !!data.user.team,
+    };
+
+    setToken(token);
+    setUser(newUser);
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(newUser));
+    setLoading(false);
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ token, user, login, logout, loading, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

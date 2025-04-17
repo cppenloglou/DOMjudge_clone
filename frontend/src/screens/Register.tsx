@@ -17,33 +17,28 @@ import { useState } from "react";
 
 const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
 
-export const registerUser = async (
-  username: string,
-  password: string,
-  team: string
-) => {
-  try {
-    const response = await axios.post(
-      `${API_URL}/register`,
-      { username, password },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error) {
-    console.error("Login error:", error);
-    throw new Error("Login failed");
-  }
-};
-
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
-  const [team, setTeam] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+
+  const registerUser = async (username: string, password: string) => {
+    try {
+      await axios.post(
+        `${API_URL}/register`,
+        { username, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Login error:", error);
+      throw new Error("Login failed");
+    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,11 +47,6 @@ export default function RegisterPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("Invalid email format.");
-      return;
-    }
-
-    if (!team || team.trim() === "") {
-      alert("Team name is required.");
       return;
     }
 
@@ -71,8 +61,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await registerUser(email, password, team);
-      alert("Registration successful!");
+      await registerUser(email, password);
       navigate("/login");
     } catch (err) {
       alert("Registration failed. Please try again.");
@@ -110,16 +99,6 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Team Name</Label>
-              <Input
-                id="team"
-                required
-                type="email"
-                value={team}
-                onChange={(e) => setTeam(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
               </div>
@@ -136,7 +115,7 @@ export default function RegisterPage() {
                 <Label htmlFor="password">Confirm Password</Label>
               </div>
               <Input
-                id="password"
+                id="forgot-password"
                 required
                 type="password"
                 value={confirmPassword}

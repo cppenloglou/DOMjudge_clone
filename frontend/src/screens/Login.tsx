@@ -19,29 +19,29 @@ import { AuthContext } from "../context/AuthContext";
 
 const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
 
-export const loginUser = async (username: string, password: string) => {
-  try {
-    const response = await axios.post(
-      `${API_URL}/login`,
-      { username, password },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return response.data.accessToken;
-  } catch (error) {
-    console.error("Login error:", error);
-    throw new Error("Login failed");
-  }
-};
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const loginUser = async (username: string, password: string) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/login`,
+        { username, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      login(response.data);
+    } catch (error) {
+      console.error("Login error:", error);
+      throw new Error("Login failed");
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,12 +56,9 @@ export default function LoginPage() {
       alert("Password cannot be empty.");
       return;
     }
-
     try {
-      const token = await loginUser(email, password);
-
-      login(token);
-      navigate("/");
+      await loginUser(email, password);
+      navigate("/", { replace: true });
     } catch (err) {
       alert("Login failed. Please check your credentials.");
     }

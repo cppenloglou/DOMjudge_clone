@@ -8,7 +8,6 @@ import {
   Clock,
   Code,
   FileText,
-  Home,
   Menu,
   MessageSquare,
   Users,
@@ -27,7 +26,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export function Navbar() {
   const { logout } = useContext(AuthContext);
@@ -55,14 +54,14 @@ export function Navbar() {
             <SheetContent side="left" className="w-[280px] sm:w-[350px]">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                  <a
-                    href="/"
+                  <Link
+                    to="/"
                     className="flex items-center gap-2 font-bold"
                     onClick={() => setIsOpen(false)}
                   >
                     <Award className="h-6 w-6 text-primary" />
                     <span>CodeJudge</span>
-                  </a>
+                  </Link>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -78,61 +77,61 @@ export function Navbar() {
                       <span>Problems</span>
                     </div>
                     <div className="flex flex-col gap-2 pl-6">
-                      <a
-                        href="/problems"
+                      <Link
+                        to="/problems"
                         className="text-sm text-muted-foreground hover:text-foreground"
                         onClick={() => setIsOpen(false)}
                       >
                         All Problems
-                      </a>
-                      <a
-                        href="/problems/categories"
+                      </Link>
+                      <Link
+                        to="/problems/categories"
                         className="text-sm text-muted-foreground hover:text-foreground"
                         onClick={() => setIsOpen(false)}
                       >
                         Categories
-                      </a>
-                      <a
-                        href="/problems/submissions"
+                      </Link>
+                      <Link
+                        to="/problems/submissions"
                         className="text-sm text-muted-foreground hover:text-foreground"
                         onClick={() => setIsOpen(false)}
                       >
                         My Submissions
-                      </a>
+                      </Link>
                     </div>
                   </div>
-                  <a
-                    href="/scoreboard"
+                  <Link
+                    to="/scoreboard"
                     className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                     onClick={() => setIsOpen(false)}
                   >
                     <Award className="h-4 w-4" />
                     <span>Scoreboard</span>
-                  </a>
-                  <a
-                    href="/clarifications"
+                  </Link>
+                  <Link
+                    to="/clarifications"
                     className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                     onClick={() => setIsOpen(false)}
                   >
                     <MessageSquare className="h-4 w-4" />
                     <span>Clarifications</span>
-                  </a>
-                  <a
-                    href="/teams"
+                  </Link>
+                  <Link
+                    to="/teams"
                     className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                     onClick={() => setIsOpen(false)}
                   >
                     <Users className="h-4 w-4" />
                     <span>Teams</span>
-                  </a>
-                  <a
-                    href="/docs"
+                  </Link>
+                  <Link
+                    to="/docs"
                     className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                     onClick={() => setIsOpen(false)}
                   >
                     <FileText className="h-4 w-4" />
                     <span>Docs</span>
-                  </a>
+                  </Link>
                 </nav>
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
@@ -143,20 +142,20 @@ export function Navbar() {
                       <span className="text-sm font-medium">Team Alpha</span>
                     </div>
                     <div className="flex flex-col gap-2 pl-8">
-                      <a
-                        href="/profile"
+                      <Link
+                        to="/profile"
                         className="text-sm text-muted-foreground hover:text-foreground"
                         onClick={() => setIsOpen(false)}
                       >
                         Profile
-                      </a>
-                      <a
-                        href="/settings"
+                      </Link>
+                      <Link
+                        to="/settings"
                         className="text-sm text-muted-foreground hover:text-foreground"
                         onClick={() => setIsOpen(false)}
                       >
                         Settings
-                      </a>
+                      </Link>
                       <button
                         className="text-left text-sm text-muted-foreground hover:text-foreground"
                         onClick={handleLogout}
@@ -172,10 +171,10 @@ export function Navbar() {
         </div>
 
         {/* Logo - always visible */}
-        <a href="/" className="flex items-center gap-2 font-bold">
+        <Link to="/" className="flex items-center gap-2 font-bold">
           <Award className="h-6 w-6 text-primary" />
           <span className="hidden sm:inline">CodeJudge</span>
-        </a>
+        </Link>
 
         {/* Main navigation - visible on large screens */}
         <nav className="hidden lg:flex mx-auto">
@@ -195,52 +194,52 @@ export function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                   <DropdownMenuItem asChild>
-                    <a href="/problems">All Problems</a>
+                    <Link to="/problems">All Problems</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <a href="/problems/categories">Categories</a>
+                    <Link to="/problems/categories">Categories</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <a href="/problems/submissions">My Submissions</a>
+                    <Link to="/problems/submissions">My Submissions</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </li>
             <li>
-              <a
-                href="/scoreboard"
+              <Link
+                to="/scoreboard"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 <Award className="h-4 w-4" />
                 <span>Scoreboard</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/clarifications"
+              <Link
+                to="/clarifications"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 <MessageSquare className="h-4 w-4" />
                 <span>Clarifications</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/teams"
+              <Link
+                to="/teams"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 <Users className="h-4 w-4" />
                 <span>Teams</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/docs"
+              <Link
+                to="/docs"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 <FileText className="h-4 w-4" />
                 <span>Docs</span>
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
@@ -278,10 +277,10 @@ export function Navbar() {
               <DropdownMenuLabel>Team Alpha</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <a href="/profile">Profile</a>
+                <Link to="/profile">Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/settings">Settings</a>
+                <Link to="/settings">Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
