@@ -7,9 +7,20 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5432:5432'
+    networks:
+      my_custom_network:
+        ipv4_address: 172.30.0.2
 
   redis:
     image: 'redis:latest'
     ports:
       - '6379:6379'
     command: redis-server --timeout 60 --databases 1
+
+networks:
+  my_custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1

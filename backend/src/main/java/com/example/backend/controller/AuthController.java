@@ -6,8 +6,9 @@ import com.example.backend.dto.RegisterDto;
 import com.example.backend.entity.User;
 import com.example.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
+    Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     private final UserService userService;
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto, HttpServletResponse response) {
-        var authenticationDetails = userService.authenticate(loginDto, response);
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        var authenticationDetails = userService.authenticate(loginDto);
         if(authenticationDetails != null && !authenticationDetails.isEmpty()){
             return ResponseEntity.ok()
                     .header("Authorization", "Bearer " + authenticationDetails.get("access_token"))
@@ -31,7 +34,8 @@ public class AuthController {
                             LoginResponse
                                     .builder()
                                     .user((User) authenticationDetails.get("user"))
-                                    .accessToken((String) authenticationDetails.get("access_token"))
+                                    .accessToken((String) authenticationDetails.get("accessToken"))
+                                    .refreshToken((String) authenticationDetails.get("refreshToken"))
                                     .build()
                     );
         }
@@ -39,24 +43,25 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        var accessToken = userService.refreshToken(request, response);
-        if(accessToken != null)
+    public ResponseEntity<?> refreshToken(@RequestBody() String refreshToken) {
+        logger.info("Refresh token: {}", refreshToken);
+        var refreshTokenDetails = userService.refreshToken(refreshToken);
+        if(refreshTokenDetails.get("accessToken") != null)
             return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + accessToken)
-                .body("accessToken: " + accessToken);
+                .body(refreshTokenDetails);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Refresh Token");
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDto registerDto) {
-        var user = userService.register(registerDto);
-        return ResponseEntity.ok(user);
+        userService.register(registerDto);
+        return ResponseEntity.ok().body("User registered successfully");
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        userService.logout(request, response);
+    public ResponseEntity<?> logout(HttpServletRequest request, @RequestBody String refreshToken) {
+        logger.info("Refresh token in logout: {}", refreshToken);
+        userService.logout(request, refreshToken);
         return ResponseEntity.ok("Logged Out Successfully");
     }
 }

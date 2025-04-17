@@ -3,11 +3,11 @@ package com.example.backend.service;
 
 import com.example.backend.dto.LoginDto;
 import com.example.backend.dto.RegisterDto;
+import com.example.backend.dto.TeamDto;
+import com.example.backend.entity.Team;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -31,56 +30,61 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TeamService teamService;
 
-    public Map<String, Object> authenticate(LoginDto loginDto, HttpServletResponse response) {
+    public Map<String, Object> authenticate(LoginDto loginDto) {
         User user = (User) userDetailsService.loadUserByUsername(loginDto.getUsername());
         if(user != null) {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
             String jwtToken = jwtService.generateJwtToken(user.getUsername());
             String refreshToken = jwtService.generateRefreshToken(user.getUsername());
-            Cookie refreshTokenCookie = getRefreshTokenCookie(refreshToken);
-            // Add the cookie to the response
-            response.addCookie(refreshTokenCookie);
-            return Map.of("access_token", jwtToken,  "user", user);
+
+            return Map.of("accessToken", jwtToken,  "user", user, "refreshToken", refreshToken);
         }
         return Map.of();
     }
-    public String refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        var refreshTokenCookie = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("refresh_token")).findFirst().orElseThrow();
-        var currentRefreshToken = refreshTokenCookie.getValue();
-        if(redisService.hasToken(currentRefreshToken))
+    public Map<String, Object> refreshToken(String refreshToken) {
+        if(redisService.hasToken(refreshToken))
             return null;
-        invalidateToken(currentRefreshToken);
-        if(currentRefreshToken != null) {
-            if(jwtService.validateToken(currentRefreshToken)) {
-                var username = jwtService.extractSubject(currentRefreshToken);
+        invalidateToken(refreshToken);
+        if(refreshToken != null) {
+            if(jwtService.validateToken(refreshToken)) {
+                var username = jwtService.extractSubject(refreshToken);
                 String jwtToken = jwtService.generateJwtToken(username);
                 String newRefreshToken = jwtService.generateRefreshToken(username);
-                refreshTokenCookie = getRefreshTokenCookie(newRefreshToken);
-                // Add the cookie to the response
-                response.addCookie(refreshTokenCookie);
-                return jwtToken;
+                return Map.of("accessToken", jwtToken,  "refreshToken", newRefreshToken);
             }
         }
         return null;
     }
 
-    public User register(RegisterDto registerDto) {
+    public void register(RegisterDto registerDto) {
         User user = User.builder()
-            .username(registerDto.getUsername())
+            .username(registerDto.getEmail())
             .password(passwordEncoder.encode(registerDto.getPassword()))
             .roles(List.of("ROLE_USER"))
             .build();
-        return userRepository.save(user);
+
+        User user1 = userRepository.save(user);
+        TeamDto teamDto = TeamDto.builder()
+                .userId(user1.getId())
+                .members(registerDto.getMembers())
+                .university(registerDto.getUniversity())
+                .name(registerDto.getTeamName())
+                .build();
+
+        Team team = teamService.register(teamDto);
+
+        user.setTeam(team);
+
+        userRepository.save(user);
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        var refreshTokenCookie = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("refresh_token")).findFirst().orElseThrow();
+    public void logout(HttpServletRequest request, String refreshToken) {
         var token = request.getHeader("Authorization").substring(7);
         log.info("Token value from request: {}", token);
         invalidateToken(token);
-        invalidateToken(refreshTokenCookie.getValue());
-        invalidateRefreshTokenCookie(response, refreshTokenCookie);
+        invalidateToken(refreshToken);
     }
 
     private void invalidateToken(String token) {
@@ -92,21 +96,4 @@ public class UserService {
         }
     }
 
-    private Cookie getRefreshTokenCookie(String token) {
-        var cookieMaxAge = (int) (jwtService.extractExpiration(token).getTime() - System.currentTimeMillis()) / 1000;
-        if(cookieMaxAge < 0)
-            cookieMaxAge = 0;
-        Cookie refreshTokenCookie = new Cookie("refresh_token", token);
-        refreshTokenCookie.setHttpOnly(true);  // Prevents JavaScript access (XSS protection)
-        refreshTokenCookie.setSecure(true);    // Ensures HTTPS only (important for production)
-        refreshTokenCookie.setPath("/");       // Available for the entire application
-        refreshTokenCookie.setMaxAge(cookieMaxAge); // Set to the remaining TTL of the token.
-        return refreshTokenCookie;
-    }
-
-    private void invalidateRefreshTokenCookie(HttpServletResponse response, Cookie refreshTokenCookie) {
-        refreshTokenCookie.setMaxAge(0);
-        refreshTokenCookie.setPath("/");
-        response.addCookie(refreshTokenCookie);
-    }
 }
