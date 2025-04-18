@@ -2,7 +2,7 @@ import Home from "./screens/Home";
 import Login from "./screens/Login";
 import ProblemsPage from "./screens/Problems";
 import RegisterPage from "./screens/Register";
-import TeamRegistrationPage from "./screens/TeamRegistration";
+import TeamRegistrationPage from "./screens/Register";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
