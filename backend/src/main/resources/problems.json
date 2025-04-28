@@ -2,61 +2,61 @@
   {
     "name": "Two Sum",
     "difficulty": "EASY",
-    "filePath": "/problems/two-sum",
+    "filePath": "problems_description/two-sum.txt",
     "testcases": 5
   },
   {
     "name": "Reverse Linked List",
     "difficulty": "MEDIUM",
-    "filePath": "/problems/reverse-linked-list",
+    "filePath": "problems_description/reverse-linked-list.txt",
     "testcases": 3
   },
   {
     "name": "Binary Tree Inorder Traversal",
     "difficulty": "MEDIUM",
-    "filePath": "/problems/binary-tree-inorder",
+    "filePath": "problems_description/binary-tree-inorder-traversal.txt",
     "testcases": 4
   },
   {
     "name": "Merge Intervals",
     "difficulty": "MEDIUM",
-    "filePath": "/problems/merge-intervals",
+    "filePath": "problems_description/merge-intervals.txt",
     "testcases": 6
   },
   {
     "name": "Longest Palindromic Substring",
     "difficulty": "HARD",
-    "filePath": "/problems/longest-palindrome",
+    "filePath": "problems_description/longest-palindromic-substring.txt",
     "testcases": 7
   },
   {
     "name": "Valid Parentheses",
     "difficulty": "EASY",
-    "filePath": "/problems/valid-parentheses",
+    "filePath": "problems_description/valid-parentheses.txt",
     "testcases": 8
   },
   {
     "name": "Search in Rotated Sorted Array",
     "difficulty": "HARD",
-    "filePath": "/problems/search-rotated-array",
+    "filePath": "problems_description/search-in-rotated-sorted-array.txt",
     "testcases": 5
   },
   {
     "name": "Container With Most Water",
     "difficulty": "MEDIUM",
-    "filePath": "/problems/container-water",
+    "filePath": "problems_description/container-with-most-water.txt",
     "testcases": 6
   },
   {
     "name": "Add Two Numbers",
     "difficulty": "MEDIUM",
-    "filePath": "/problems/add-two-numbers",
+    "filePath": "problems_description/add-two-numbers.txt",
     "testcases": 4
   },
   {
     "name": "Median of Two Sorted Arrays",
     "difficulty": "HARD",
-    "filePath": "/problems/median-arrays",
+    "filePath": "problems_description/median-of-two-sorted-arrays.txt",
     "testcases": 9
   }
 ]
