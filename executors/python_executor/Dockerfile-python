@@ -1,0 +1,18 @@
+# Use the official Python base image
+FROM python:3.9-slim
+
+# Install dependencies for FastAPI
+RUN pip install fastapi uvicorn python-multipart
+
+
+# Set working directory
+WORKDIR /app
+
+# Copy the FastAPI app code into the container
+COPY . /app
+
+# Expose the port that FastAPI will run on
+EXPOSE 8000
+
+# Run the FastAPI app
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  c_executor:
+    build:
+      context: ./c_executor
+      dockerfile: Dockerfile-c
+    ports:
+      - "5003:8000"
+    volumes:
+      - ./c_executor/problems:/app/problems  # Mount problems directory for C executor
+    networks:
+      - executor_network
+
+  cpp_executor:
+    build:
+      context: ./cpp_executor
+      dockerfile: Dockerfile-cpp
+    ports:
+      - "5001:8000"
+    volumes:
+      - ./cpp_executor/problems:/app/problems  # Mount problems directory for C++ executor
+    networks:
+      - executor_network
+
+  java_executor:
+    build:
+      context: ./java_executor
+      dockerfile: Dockerfile-java
+    ports:
+      - "5004:8000"
+    volumes:
+      - ./java_executor/problems:/app/problems  # Mount problems directory for Java executor
+    networks:
+      - executor_network
+
+  python_executor:
+    build:
+      context: ./python_executor
+      dockerfile: Dockerfile-python
+    ports:
+      - "5002:8000"
+    volumes:
+      - ./python_executor/problems:/app/problems  # Mount problems directory for Python executor
+    networks:
+      - executor_network
+
+networks:
+  executor_network:
+    driver: bridge
