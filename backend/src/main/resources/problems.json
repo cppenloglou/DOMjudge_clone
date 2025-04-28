@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Two Sum",
+    "difficulty": "EASY",
+    "filePath": "/problems/two-sum",
+    "testcases": 5
+  },
+  {
+    "name": "Reverse Linked List",
+    "difficulty": "MEDIUM",
+    "filePath": "/problems/reverse-linked-list",
+    "testcases": 3
+  },
+  {
+    "name": "Binary Tree Inorder Traversal",
+    "difficulty": "MEDIUM",
+    "filePath": "/problems/binary-tree-inorder",
+    "testcases": 4
+  },
+  {
+    "name": "Merge Intervals",
+    "difficulty": "MEDIUM",
+    "filePath": "/problems/merge-intervals",
+    "testcases": 6
+  },
+  {
+    "name": "Longest Palindromic Substring",
+    "difficulty": "HARD",
+    "filePath": "/problems/longest-palindrome",
+    "testcases": 7
+  },
+  {
+    "name": "Valid Parentheses",
+    "difficulty": "EASY",
+    "filePath": "/problems/valid-parentheses",
+    "testcases": 8
+  },
+  {
+    "name": "Search in Rotated Sorted Array",
+    "difficulty": "HARD",
+    "filePath": "/problems/search-rotated-array",
+    "testcases": 5
+  },
+  {
+    "name": "Container With Most Water",
+    "difficulty": "MEDIUM",
+    "filePath": "/problems/container-water",
+    "testcases": 6
+  },
+  {
+    "name": "Add Two Numbers",
+    "difficulty": "MEDIUM",
+    "filePath": "/problems/add-two-numbers",
+    "testcases": 4
+  },
+  {
+    "name": "Median of Two Sorted Arrays",
+    "difficulty": "HARD",
+    "filePath": "/problems/median-arrays",
+    "testcases": 9
+  }
+]

@@ -22,7 +22,7 @@ import java.util.Optional;
 @Slf4j
 public class JwtService {
 
-    private static final long ACCESS_TOKEN_TTL = 30 * 1000;
+    private static final long ACCESS_TOKEN_TTL = 7 * 24 * 3600 * 1000;
     private static final long REFRESH_TOKEN_TTL = 7 * 24 * 3600 * 1000;
     private final UserRepository userRepository;
     @Value("${rsaPrivateKey}")

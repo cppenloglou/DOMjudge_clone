@@ -1,11 +1,19 @@
 package com.example.backend.config;
 
 
+import com.example.backend.dto.RegisterDto;
+import com.example.backend.entity.User;
 import com.example.backend.filter.JwtAuthenticationFilter;
 import com.example.backend.filter.TokenBlacklistFilter;
+import com.example.backend.repository.UserRepository;
+import com.example.backend.service.JwtService;
+import com.example.backend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -37,6 +45,7 @@ public class SecurityConfig {
     private final TokenBlacklistFilter tokenBlacklistFilter;
     private final AuthenticationProvider authenticationProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -90,7 +99,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://172.18.15.201:5173", "http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://172.18.8.172:5173", "http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -99,5 +108,42 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    @Bean
+    public CommandLineRunner createTempUser(UserService userService, JwtService jwtService, UserRepository userRepository) {
+        return args -> {
+            String tempEmail = "tempuser@example.com";
+
+            if (userRepository.findByUsername(tempEmail).isEmpty()) {
+                RegisterDto registerDto = RegisterDto.builder()
+                        .email(tempEmail)
+                        .password("password") // plain password for registration
+                        .teamName("Temp Team")
+                        .university("Debug University")
+                        .members("Temp Member 1," + "Temp Member 2")
+                        .build();
+
+                // Reuse your real registration logic
+                userService.register(registerDto);
+
+                // Fetch the user again to generate token
+                User tempUser = userRepository.findByUsername(tempEmail).orElseThrow();
+
+                String token = jwtService.generateJwtToken(tempUser.getUsername());
+                String refreshToken = jwtService.generateJwtToken(tempUser.getUsername());
+
+                logger.info("==================================================");
+                logger.info(" TEMP USER CREATED FOR DEBUGGING ");
+                logger.info(" Email: {}", tempEmail);
+                logger.info(" Password: {}", "password");
+                logger.info(" Access Token: Bearer {}", token);
+                logger.info(" Refresh Token: Bearer {}", refreshToken);
+                logger.info("==================================================");
+            } else {
+                logger.info("Temp user already exists. No new user created.");
+            }
+        };
+    }
+
 
 }
