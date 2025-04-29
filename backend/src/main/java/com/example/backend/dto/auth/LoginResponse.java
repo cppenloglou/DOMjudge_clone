@@ -1,4 +1,4 @@
-package com.example.backend.controller;
+package com.example.backend.dto.auth;
 
 import com.example.backend.entity.User;
 import lombok.*;

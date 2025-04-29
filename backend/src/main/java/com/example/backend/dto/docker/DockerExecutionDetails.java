@@ -1,4 +1,4 @@
-package com.example.backend.dto;
+package com.example.backend.dto.docker;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class ExecutionDetails {
+public class DockerExecutionDetails {
     private String message;
     private int testcaseIndex;
     private String expectedOutput;

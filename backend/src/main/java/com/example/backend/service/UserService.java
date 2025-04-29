@@ -1,8 +1,8 @@
 package com.example.backend.service;
 
 
-import com.example.backend.dto.LoginDto;
-import com.example.backend.dto.RegisterDto;
+import com.example.backend.dto.auth.LoginDto;
+import com.example.backend.dto.auth.RegisterDto;
 import com.example.backend.dto.TeamDto;
 import com.example.backend.entity.Team;
 import com.example.backend.entity.User;

@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.DockerExecutionResult;
+import com.example.backend.dto.docker.DockerExecutionResult;
 import com.example.backend.dto.SubmissionRequest;
 import com.example.backend.dto.SubmissionResponse;
 import com.example.backend.entity.Problem;

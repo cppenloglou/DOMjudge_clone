@@ -1,3 +1,28 @@
-Description of problem: Merge Intervals
-Difficulty: MEDIUM
-Testcases: 6
+🔗 Problem 6: Merge Intervals
+📘 Overview
+You are given a collection of intervals. Some of them may overlap. Your task is to merge overlapping intervals so that there are no conflicts in the final result.
+
+❓ Problem Statement
+Each interval is represented as a pair [start, end]. If two intervals overlap (i.e., the start of one is before the end of another), merge them into a single interval.
+
+🧾 Constraints
+1 <= intervals.length <= 10⁴
+
+All intervals are valid with start <= end.
+
+🧪 Examples
+Example 1:
+
+Input: [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+
+Explanation:
+[1,3] and [2,6] overlap, so they are merged into [1,6].
+
+Example 2:
+
+Input: [[1,4],[4,5]]
+Output: [[1,5]]
+
+Explanation:
+Even touching intervals are merged.

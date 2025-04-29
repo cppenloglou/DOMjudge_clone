@@ -1,4 +1,4 @@
-package com.example.backend.dto;
+package com.example.backend.dto.docker;
 
 import com.example.backend.enums.Status;
 import lombok.*;
@@ -12,7 +12,7 @@ import lombok.*;
 public class DockerExecutionResult {
     private String problemID;
     private Status status;
-    private ExecutionDetails details;
+    private DockerExecutionDetails details;
     private String stdout;
     private String stderr;
     private int returncode;

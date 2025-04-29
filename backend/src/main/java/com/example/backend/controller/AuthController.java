@@ -1,8 +1,9 @@
 package com.example.backend.controller;
 
 
-import com.example.backend.dto.LoginDto;
-import com.example.backend.dto.RegisterDto;
+import com.example.backend.dto.auth.LoginDto;
+import com.example.backend.dto.auth.LoginResponse;
+import com.example.backend.dto.auth.RegisterDto;
 import com.example.backend.entity.User;
 import com.example.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,7 +48,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody() String refreshToken) {
         logger.info("Refresh token: {}", refreshToken);
-        var refreshTokenDetails = userService.refreshToken(refreshToken);
+        Map<String, Object> refreshTokenDetails = userService.refreshToken(refreshToken);
         if(refreshTokenDetails.get("accessToken") != null)
             return ResponseEntity.ok()
                 .body(refreshTokenDetails);

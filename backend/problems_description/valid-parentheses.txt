@@ -1,3 +1,32 @@
-Description of problem: Valid Parentheses
-Difficulty: EASY
-Testcases: 8
+✅ Problem 10: Valid Parentheses
+📘 Overview
+Checking for balanced parentheses is a common interview problem that uses stack data structures. It tests your understanding of correct expression syntax.
+
+❓ Problem Statement
+Given a string s containing only the characters '(', ')', '{', '}', '[', and ']', determine if the input string is valid. A string is valid if:
+
+Open brackets are closed by the same type of bracket.
+
+Brackets are closed in the correct order.
+
+🧾 Constraints
+1 <= s.length <= 10⁴
+
+s consists only of the characters ()[]{}.
+
+🧪 Examples
+Example 1:
+
+Input: "()"
+Output: true
+
+Explanation:
+Simple pair, properly closed.
+
+Example 2:
+
+Input: "([)]"
+Output: false
+
+Explanation:
+Brackets are closed in the wrong order.

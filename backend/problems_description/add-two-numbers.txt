@@ -1,3 +1,35 @@
-Description of problem: Add Two Numbers
-Difficulty: MEDIUM
-Testcases: 4
+🧮 Problem 1: Add Two Numbers
+📘 Overview
+You are given two non-empty linked lists that represent two non-negative integers. The digits are stored in reverse order, and each node contains a single digit. Add the two numbers and return the sum as a new linked list.
+
+❓ Problem Statement
+The task is to simulate the addition of two numbers, digit by digit, as you would do by hand—starting from the least significant digit. If the sum of two digits exceeds 9, carry over the extra value to the next digit.
+
+🧾 Constraints
+The number of nodes in each linked list is in the range [1, 100].
+
+Each linked list node contains a digit from 0 to 9.
+
+The input numbers do not contain any leading zero, except the number 0 itself.
+
+🧪 Examples
+Example 1:
+
+Input:
+l1 = [2, 4, 3]
+l2 = [5, 6, 4]
+
+Output:
+[7, 0, 8]
+
+Explanation:
+342 + 465 = 807. The digits are stored in reverse order, so 7 is the least significant digit.
+
+Example 2:
+
+Input:
+l1 = [0]
+l2 = [0]
+
+Output:
+[0]
