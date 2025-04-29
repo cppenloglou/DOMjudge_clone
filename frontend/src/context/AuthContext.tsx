@@ -12,6 +12,15 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
 
+export type MyJwtPayload = {
+  exp: number;
+  iat: number;
+  id: number;
+  sub: string;
+  team_id: number;
+  type: String;
+};
+
 export interface User {
   id: string;
   email: string;

@@ -76,29 +76,6 @@ export function Navbar() {
                       <Code className="h-4 w-4" />
                       <span>Problems</span>
                     </div>
-                    <div className="flex flex-col gap-2 pl-6">
-                      <Link
-                        to="/problems"
-                        className="text-sm text-muted-foreground hover:text-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        All Problems
-                      </Link>
-                      <Link
-                        to="/problems/categories"
-                        className="text-sm text-muted-foreground hover:text-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Categories
-                      </Link>
-                      <Link
-                        to="/problems/submissions"
-                        className="text-sm text-muted-foreground hover:text-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        My Submissions
-                      </Link>
-                    </div>
                   </div>
                   <Link
                     to="/scoreboard"
@@ -180,30 +157,13 @@ export function Navbar() {
         <nav className="hidden lg:flex mx-auto">
           <ul className="flex items-center gap-4 xl:gap-6">
             <li>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1 h-9 px-2 text-muted-foreground hover:text-foreground"
-                  >
-                    <Code className="h-4 w-4" />
-                    <span>Problems</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem asChild>
-                    <Link to="/problems">All Problems</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/problems/categories">Categories</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/problems/submissions">My Submissions</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Link
+                to="/problems"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                <Award className="h-4 w-4" />
+                <span>Problems</span>
+              </Link>
             </li>
             <li>
               <Link
