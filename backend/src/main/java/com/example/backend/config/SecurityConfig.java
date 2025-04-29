@@ -1,7 +1,7 @@
 package com.example.backend.config;
 
 
-import com.example.backend.dto.RegisterDto;
+import com.example.backend.dto.auth.RegisterDto;
 import com.example.backend.entity.User;
 import com.example.backend.filter.JwtAuthenticationFilter;
 import com.example.backend.filter.TokenBlacklistFilter;
@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +47,9 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Value("${docker.executor.base-url}")
+    private String baseUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -99,7 +103,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://172.18.8.172:5173", "http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of(baseUrl + ":5173", "http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

@@ -1,3 +1,30 @@
-Description of problem: Search in Rotated Sorted Array
-Difficulty: HARD
-Testcases: 5
+🔍 Problem 8: Search in Rotated Sorted Array
+📘 Overview
+You are given a rotated sorted array and a target value. Your goal is to efficiently determine the index of the target using binary search logic.
+
+❓ Problem Statement
+Given an array nums sorted in ascending order and rotated at an unknown pivot, and an integer target, return the index of target if it is in the array. Otherwise, return -1. The solution must run in O(log n) time.
+
+🧾 Constraints
+1 <= nums.length <= 5000
+
+-10⁴ <= nums[i], target <= 10⁴
+
+All values are unique.
+
+🧪 Examples
+Example 1:
+
+Input: nums = [4,5,6,7,0,1,2], target = 0
+Output: 4
+
+Explanation:
+The target is found at index 4.
+
+Example 2:
+
+Input: nums = [4,5,6,7,0,1,2], target = 3
+Output: -1
+
+Explanation:
+The target is not present in the array.

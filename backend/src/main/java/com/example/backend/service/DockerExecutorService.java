@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.DockerExecutionResult;
-import com.example.backend.dto.ExecutionDetails;
+import com.example.backend.dto.docker.DockerExecutionResult;
+import com.example.backend.dto.docker.DockerExecutionDetails;
 import com.example.backend.enums.Status;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -95,7 +95,7 @@ public class DockerExecutorService {
                 .status(Status.ERROR)
                 .stdout("")
                 .details(
-                        ExecutionDetails.builder()
+                        DockerExecutionDetails.builder()
                         .message(errorMessage)
                         .testcaseIndex(-1)
                         .actualOutput("")

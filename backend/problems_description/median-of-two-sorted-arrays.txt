@@ -1,3 +1,30 @@
-Description of problem: Median of Two Sorted Arrays
-Difficulty: HARD
-Testcases: 9
+⚖️ Problem 5: Median of Two Sorted Arrays
+📘 Overview
+Finding the median is a common statistical task. When two sorted arrays are merged, the median is the middle value (or average of the two middle values). This problem challenges you to do this efficiently.
+
+❓ Problem Statement
+Given two sorted arrays nums1 and nums2, return the median of the combined sorted array. The algorithm should run in O(log(min(m,n))) time.
+
+🧾 Constraints
+nums1.length + nums2.length >= 1
+
+Both arrays are sorted in non-decreasing order.
+
+All elements are integers (positive, negative, or zero).
+
+🧪 Examples
+Example 1:
+
+Input: nums1 = [1, 3], nums2 = [2]
+Output: 2.0
+
+Explanation:
+Merged array = [1, 2, 3]. Median = 2
+
+Example 2:
+
+Input: nums1 = [1, 2], nums2 = [3, 4]
+Output: 2.5
+
+Explanation:
+Merged = [1, 2, 3, 4]. Median = (2 + 3)/2 = 2.5
