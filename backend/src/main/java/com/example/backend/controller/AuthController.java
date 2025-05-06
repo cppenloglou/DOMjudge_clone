@@ -5,6 +5,7 @@ import com.example.backend.dto.auth.LoginDto;
 import com.example.backend.dto.auth.LoginResponse;
 import com.example.backend.dto.auth.RegisterDto;
 import com.example.backend.entity.User;
+import com.example.backend.service.CountdownService;
 import com.example.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +26,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final CountdownService countdownService;
     Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) throws UsernameNotFoundException {
+        logger.info("Login Request");
         var authenticationDetails = userService.authenticate(loginDto);
+        logger.info("Login Authentication Response");
         if(authenticationDetails != null && !authenticationDetails.isEmpty()){
             return ResponseEntity.ok()
                     .header("Authorization", "Bearer " + authenticationDetails.get("access_token"))
@@ -42,6 +47,9 @@ public class AuthController {
                                     .build()
                     );
         }
+        if(!countdownService.isCountdownActive())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The contest doesn't start yet!");
+        logger.info("Login Unauthorized");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Username or Password");
     }
 

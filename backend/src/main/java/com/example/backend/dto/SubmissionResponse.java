@@ -6,5 +6,6 @@ public record SubmissionResponse(
         Status status,
         int testcasesPassed,
         double avgTime,
-        String executionLog
+        String executionLog,
+        String submittedAt
 ) {}

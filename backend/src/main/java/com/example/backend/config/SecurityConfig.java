@@ -48,7 +48,7 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("${docker.executor.base-url}")
+    @Value("${frontend.base-url}")
     private String baseUrl;
 
     @Bean
@@ -145,6 +145,48 @@ public class SecurityConfig {
                 logger.info("==================================================");
             } else {
                 logger.info("Temp user already exists. No new user created.");
+            }
+        };
+    }
+
+    @Bean
+    public CommandLineRunner createAdminUser(UserService userService, JwtService jwtService, UserRepository userRepository) {
+        return args -> {
+            String adminEmail = "admin@example.com";
+
+            if (userRepository.findByUsername(adminEmail).isEmpty()) {
+                RegisterDto adminRegisterDto = RegisterDto.builder()
+                        .email(adminEmail)
+                        .password("adminpassword") // plain password for registration
+                        .teamName("Admin Team")
+                        .university("Admin University")
+                        .members("Admin Member 1, Admin Member 2")
+                        .build();
+
+                // Reuse your real registration logic
+                userService.register(adminRegisterDto);
+
+                // Fetch the admin user again to generate token
+                User adminUser = userRepository.findByUsername(adminEmail).orElseThrow();
+
+                // Assign the "ADMIN" role to the user (You may need to modify your user entity and service for this)
+                adminUser.setRoles(List.of("ROLE_ADMIN"));  // Assuming you have a setRoles method
+
+                // Save the user with roles
+                userRepository.save(adminUser);
+
+                String token = jwtService.generateJwtToken(adminUser.getUsername());
+                String refreshToken = jwtService.generateJwtToken(adminUser.getUsername());
+
+                logger.info("==================================================");
+                logger.info(" ADMIN USER CREATED FOR DEBUGGING ");
+                logger.info(" Email: {}", adminEmail);
+                logger.info(" Password: {}", "adminpassword");
+                logger.info(" Access Token: Bearer {}", token);
+                logger.info(" Refresh Token: Bearer {}", refreshToken);
+                logger.info("==================================================");
+            } else {
+                logger.info("Admin user already exists. No new user created.");
             }
         };
     }

@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -63,7 +65,7 @@ public class SubmissionService {
                     .avgTime(result.getAvgTime())
                     .build();
 
-            submissionRepository.save(submission);
+            Submission savedSubmission =  submissionRepository.save(submission);
 
             // 5. Clean up and return response
             Files.deleteIfExists(codePath);
@@ -72,7 +74,9 @@ public class SubmissionService {
                     submission.getStatus(),
                     submission.getTestcasesPassed(),
                     submission.getAvgTime(),
-                    result.getStderr()
+                    result.getStderr(),
+                    savedSubmission.getTimestamp().toString()
+
             );
 
         } catch (Exception e) {
@@ -81,7 +85,8 @@ public class SubmissionService {
                     Status.FAILED,
                     0,
                     0,
-                    "Error: " + e.getMessage()
+                    "Error: " + e.getMessage(),
+                    null
             );
         }
     }
@@ -98,5 +103,27 @@ public class SubmissionService {
         String fileName = file.getOriginalFilename();
         assert fileName != null;
         return fileName.substring(fileName.lastIndexOf(".") + 1);
+    }
+
+    public List<SubmissionResponse> getSubmissionsByTeamAndProblemOrderByTimestampDesc(Long team_id, Long problem_id) {
+        Optional<Team> optional_team = teamRepository.findById(team_id);
+        Optional<Problem> optional_problem = problemRepository.findById(problem_id);
+        if (optional_team.isEmpty()) {
+            throw new IllegalArgumentException("Team not found");
+        }
+        if (optional_problem.isEmpty()) {
+            throw new IllegalArgumentException("Problem not found");
+        }
+        return submissionRepository
+                .getSubmissionsByTeamAndProblemOrderByTimestampDesc(optional_team.get(), optional_problem.get())
+                .stream()
+                .map(
+                        submission -> new SubmissionResponse(
+                                submission.getStatus(),
+                                submission.getTestcasesPassed(),
+                                submission.getAvgTime(),
+                                "",
+                                submission.getTimestamp().toString()))
+                .collect(Collectors.toList());
     }
 }

@@ -10,14 +10,18 @@ import com.example.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -31,17 +35,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TeamService teamService;
+    private final CountdownService countdownService;
 
-    public Map<String, Object> authenticate(LoginDto loginDto) {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    public Map<String, Object> authenticate(LoginDto loginDto) throws UsernameNotFoundException {
         User user = (User) userDetailsService.loadUserByUsername(loginDto.getUsername());
-        if(user != null) {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-            String jwtToken = jwtService.generateJwtToken(user.getUsername());
-            String refreshToken = jwtService.generateRefreshToken(user.getUsername());
-
-            return Map.of("accessToken", jwtToken,  "user", user, "refreshToken", refreshToken);
+        logger.info("Username {} found", loginDto.getUsername());
+        Optional<String> role = user.getRoles().stream().findFirst();
+        if(role.isEmpty()) {
+            throw new UsernameNotFoundException("Invalid username or password");
         }
-        return Map.of();
+
+        if(!countdownService.isCountdownActive() && role.get().equals("ROLE_USER")) {
+            return null;
+        }
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+        String jwtToken = jwtService.generateJwtToken(user.getUsername());
+        String refreshToken = jwtService.generateRefreshToken(user.getUsername());
+
+        return Map.of("accessToken", jwtToken,  "user", user, "refreshToken", refreshToken);
     }
     public Map<String, Object> refreshToken(String refreshToken) {
         if(redisService.hasToken(refreshToken))

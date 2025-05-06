@@ -24,7 +24,7 @@ public class DockerExecutorService {
 
     private static final Logger logger = LoggerFactory.getLogger(DockerExecutorService.class);
 
-    @Value("${docker.executor.base-url}")
+    @Value("${frontend.base-url}")
     private String baseUrl;
 
     public DockerExecutorService(RestTemplate restTemplate) {

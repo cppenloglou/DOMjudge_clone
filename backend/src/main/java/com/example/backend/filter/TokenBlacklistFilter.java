@@ -37,7 +37,8 @@ public class TokenBlacklistFilter extends OncePerRequestFilter {
             handleBlacklistedToken(response);
             return;
         }
-        logger.info("Token is still active.");
+        if(token != null)
+            logger.info("Token is still active.");
         filterChain.doFilter(request, response);
     }
     
