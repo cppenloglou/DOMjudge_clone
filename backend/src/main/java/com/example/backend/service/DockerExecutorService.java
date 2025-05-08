@@ -16,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.file.Path;
+import java.util.List;
 
 @Service
 public class DockerExecutorService {
@@ -24,8 +25,22 @@ public class DockerExecutorService {
 
     private static final Logger logger = LoggerFactory.getLogger(DockerExecutorService.class);
 
-    @Value("${frontend.base-url}")
-    private String baseUrl;
+    @Value("${docker.cpp.base.host}")
+    private String cppBaseUrl;
+    @Value("${docker.python.base.host}")
+    private String pythonBaseUrl;
+    @Value("${docker.c.base.host}")
+    private String cBaseUrl;
+    @Value("${docker.java.base.host}")
+    private String javaBaseUrl;
+    @Value("${docker.cpp.executor.port}")
+    private String cppPort;
+    @Value("${docker.python.executor.port}")
+    private String pythonPort;
+    @Value("${docker.c.executor.port}")
+    private String cPort;
+    @Value("${docker.java.executor.port}")
+    private String javaPort;
 
     public DockerExecutorService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -76,16 +91,17 @@ public class DockerExecutorService {
     }
 
     private String getContainerUrl(String language) {
-        return baseUrl + ":" + getLanguagePort(language) + "/execute";
+        List<String> host_port = getLanguagePort(language);
+        logger.info("Executor url: {}", host_port.getFirst());
+        return "http://" + host_port.getFirst() + ":" + host_port.getLast() + "/execute";
     }
 
-    private String getLanguagePort(String language) {
+    private List<String> getLanguagePort(String language) {
         return switch (language.toLowerCase()) {
-            case "cpp" -> "5001";
-            case "python", "py" -> "5002";
-            case "c" -> "5003";
-            case "java" -> "5004";
-            default -> "5004";
+            case "cpp" ->  List.of(cppBaseUrl, cppPort);
+            case "python", "py" -> List.of(pythonBaseUrl, pythonPort);
+            case "c" -> List.of(cBaseUrl, cPort);
+            default -> List.of(javaBaseUrl, javaPort);
         };
     }
 

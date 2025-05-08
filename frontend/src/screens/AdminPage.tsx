@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,20 +12,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Clock,
-  Play,
-  Pause,
-  RotateCcw,
-  ShieldAlert,
-  LogOut,
-} from "lucide-react";
+import { Clock, Play, RotateCcw, ShieldAlert, LogOut } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { useTimer } from "@/context/TimerContext";
 import { useNavigate } from "react-router-dom";
-import API from "@/services/api";
-
 // Sample contests
 const contests = [
   { id: "icpc2025", name: "ICPC Regional 2025" },
@@ -35,10 +26,10 @@ const contests = [
 ];
 
 export default function AdminPage() {
-  const [selectedContest, setSelectedContest] = useState("icpc2025");
+  const [selectedContest] = useState("icpc2025");
   const [hours, setHours] = useState("5");
   const [minutes, setMinutes] = useState("0");
-  const [isPublic, setIsPublic] = useState(true);
+  const [isPublic] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const { logout } = useAuth();
@@ -70,11 +61,6 @@ export default function AdminPage() {
     setTimeout(() => {
       setShowSuccess(false);
     }, 3000);
-  };
-
-  // Handle timer pause
-  const handlePauseTimer = () => {
-    setIsCountdownActive(false);
   };
 
   return (

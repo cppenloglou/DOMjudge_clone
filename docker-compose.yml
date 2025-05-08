@@ -1,0 +1,147 @@
+version: "3.8"
+
+services:
+  # Database services
+  postgres:
+    image: "postgres:latest"
+    environment:
+      - "POSTGRES_DB=mydatabase"
+      - "POSTGRES_PASSWORD=secret"
+      - "POSTGRES_USER=myuser"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      my_custom_network:
+        ipv4_address: 172.30.0.2
+      backend_network:
+    restart: unless-stopped
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    command: redis-server --timeout 60 --databases 1
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+  # Executor services
+  c_executor:
+    build:
+      context: ./executors/c_executor
+      dockerfile: Dockerfile-c
+    ports:
+      - "5003:8000"
+    volumes:
+      - ./executors/c_executor/problems:/app/problems
+    networks:
+      - executor_network
+      - backend_network
+    restart: unless-stopped
+
+  cpp_executor:
+    build:
+      context: ./executors/cpp_executor
+      dockerfile: Dockerfile-cpp
+    ports:
+      - "5001:8000"
+    volumes:
+      - ./executors/cpp_executor/problems:/app/problems
+    networks:
+      - executor_network
+      - backend_network
+    restart: unless-stopped
+
+  java_executor:
+    build:
+      context: ./executors/java_executor
+      dockerfile: Dockerfile-java
+    ports:
+      - "5004:8000"
+    volumes:
+      - ./executors/java_executor/problems:/app/problems
+    networks:
+      - executor_network
+      - backend_network
+    restart: unless-stopped
+
+  python_executor:
+    build:
+      context: ./executors/python_executor
+      dockerfile: Dockerfile-python
+    ports:
+      - "5002:8000"
+    volumes:
+      - ./executors/python_executor/problems:/app/problems
+    networks:
+      - executor_network
+      - backend_network
+    restart: unless-stopped
+
+  # Backend service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+      - c_executor
+      - cpp_executor
+      - python_executor
+      - java_executor
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase
+      - SPRING_DATASOURCE_USERNAME=myuser
+      - SPRING_DATASOURCE_PASSWORD=secret
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - DOCKER_CPP_BASE_HOST=cpp_executor
+      - DOCKER_C_BASE_HOST=c_executor
+      - DOCKER_PYTHON_BASE_HOST=python_executor
+      - DOCKER_JAVA_BASE_HOST=java_executor
+      - DOCKER_CPP_EXECUTOR_PORT=8000
+      - DOCKER_C_EXECUTOR_PORT=8000
+      - DOCKER_PYTHON_EXECUTOR_PORT=8000
+      - DOCKER_JAVA_EXECUTOR_PORT=8000
+      - FRONTEND_BASE_URL=http://localhost:3000
+    networks:
+      - backend_network
+      - executor_network
+      - my_custom_network
+    restart: unless-stopped
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - backend_network
+    restart: unless-stopped
+
+networks:
+  backend_network:
+    driver: bridge
+  executor_network:
+    driver: bridge
+  my_custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1
+
+volumes:
+  postgres_data:
+  redis_data:

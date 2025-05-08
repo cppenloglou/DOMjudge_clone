@@ -247,6 +247,3 @@ export default function ScoreboardPage() {
     </div>
   );
 }
-function fetchTeams() {
-  throw new Error("Function not implemented.");
-}

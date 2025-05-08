@@ -10,6 +10,7 @@ import com.example.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,6 +35,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final TeamService teamService;
     private final CountdownService countdownService;
+
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
 
     public Map<String, Object> authenticate(LoginDto loginDto) throws UsernameNotFoundException {
         User user = (User) userDetailsService.loadUserByUsername(loginDto.getUsername());
@@ -102,6 +106,7 @@ public class UserService {
         log.info("Invalidating token with remaining : TTL: {} seconds", expirationTimeInMilliseconds);
         if(expirationTimeInMilliseconds > 0L){
             log.info("New Access Token Generated Successfully, Invalidating Previous Refresh token");
+            log.info("Redis Host: {}", redisHost);
             redisService.setTokenWithTTL(token, "blacklisted", expirationTimeInMilliseconds, TimeUnit.MILLISECONDS);
         }
     }

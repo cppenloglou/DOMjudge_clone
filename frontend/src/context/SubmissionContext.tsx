@@ -1,6 +1,6 @@
 import API from "@/services/api";
 import { jwtDecode } from "jwt-decode";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const API_URL = import.meta.env.VITE_APP_BASE_URL;
 
