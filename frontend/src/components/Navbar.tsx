@@ -27,21 +27,25 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTimer } from "@/context/TimerContext";
 
 export function Navbar() {
   const { logout } = useContext(AuthContext);
+  const { setIsCountdownActive } = useTimer();
   const navigate = useNavigate();
+  const { remainingSeconds, formatSeconds } = useTimer();
 
   const handleLogout = () => {
     logout();
+    setIsCountdownActive(false);
     navigate("/login");
   };
 
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="container flex h-16 items-center">
+    <header className="sticky top-0 z-50 w-full border-b bg-background px-4 sm:px-6 lg:px-8">
+      <div className="flex h-16 items-center w-full justify-between">
         {/* Mobile menu trigger - always visible on small screens */}
         <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -147,69 +151,74 @@ export function Navbar() {
           </Sheet>
         </div>
 
-        {/* Logo - always visible */}
-        <Link to="/" className="flex items-center gap-2 font-bold">
-          <Award className="h-6 w-6 text-primary" />
-          <span className="hidden sm:inline">CodeJudge</span>
-        </Link>
+        <div className="flex items-center gap-8">
+          <Link to="/" className="flex items-center gap-2 font-bold">
+            <Award className="h-6 w-6 text-primary" />
+            <span className="hidden sm:inline">CodeJudge</span>
+          </Link>
 
-        {/* Main navigation - visible on large screens */}
-        <nav className="hidden lg:flex mx-auto">
-          <ul className="flex items-center gap-4 xl:gap-6">
-            <li>
-              <Link
-                to="/problems"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                <Award className="h-4 w-4" />
-                <span>Problems</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/scoreboard"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                <Award className="h-4 w-4" />
-                <span>Scoreboard</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/clarifications"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                <MessageSquare className="h-4 w-4" />
-                <span>Clarifications</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/teams"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                <Users className="h-4 w-4" />
-                <span>Teams</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/docs"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                <FileText className="h-4 w-4" />
-                <span>Docs</span>
-              </Link>
-            </li>
-          </ul>
-        </nav>
+          {/* Main navigation - visible on large screens */}
+          <nav className="hidden lg:flex">
+            <ul className="flex items-center gap-4 xl:gap-6">
+              <li>
+                <Link
+                  to="/problems"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <Award className="h-4 w-4" />
+                  <span>Problems</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/scoreboard"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <Award className="h-4 w-4" />
+                  <span>Scoreboard</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/clarifications"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Clarifications</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/teams"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <Users className="h-4 w-4" />
+                  <span>Teams</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/docs"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Docs</span>
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
 
         {/* Right side section with clock and user info */}
         <div className="flex items-center gap-2 ml-auto">
           {/* Timer - always visible on the right */}
           <div className="flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs font-medium">
             <Clock className="h-3 w-3" />
-            <span>02:45:30</span>
+            <span>
+              {remainingSeconds
+                ? formatSeconds(remainingSeconds)
+                : "Countdown has finished!"}
+            </span>
           </div>
 
           {/* Notification bell - hidden on smallest screens */}

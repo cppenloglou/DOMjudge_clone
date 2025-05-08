@@ -22,19 +22,24 @@ import {
 } from "@/components/ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePage } from "@/context/PageContext";
 import { useProblems } from "@/context/ProblemContext";
 
 export default function ProblemsPage() {
+  const [filter, setFilter] = useState<"all" | "solved" | "unsolved">("all");
+
   const { problems, loading, fetchProblems, problemCount } = useProblems();
 
   const { currentPage, setCurrentPage, itemsPerPage } = usePage();
 
   useEffect(() => {
-    fetchProblems(currentPage - 1, itemsPerPage);
-  }, [currentPage]);
+    fetchProblems(currentPage - 1, itemsPerPage, filter);
+  }, [currentPage, filter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   // Calculate the total number of pages
   const totalPages = Math.ceil(problemCount / itemsPerPage);
@@ -59,8 +64,7 @@ export default function ProblemsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <div className="px-6 sm:px-8 md:px-10">
+      <div className="px-6 sm:px-6 md:px-6">
         <main className="flex-1 container py-6">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
@@ -72,12 +76,20 @@ export default function ProblemsPage() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <Tabs defaultValue="all" className="w-full">
+              <Tabs
+                value={filter}
+                onValueChange={(newValue) =>
+                  setFilter(newValue as "all" | "solved" | "unsolved")
+                }
+                className="w-full"
+              >
                 <div className="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
                   <TabsList>
                     <TabsTrigger value="all">All Problems</TabsTrigger>
-                    <TabsTrigger value="solved">Unsolved Problems</TabsTrigger>
-                    <TabsTrigger value="unsolved">Solved Problems</TabsTrigger>
+                    <TabsTrigger value="solved">Solved Problems</TabsTrigger>
+                    <TabsTrigger value="unsolved">
+                      Unsolved Problems
+                    </TabsTrigger>
                   </TabsList>
 
                   <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -110,7 +122,7 @@ export default function ProblemsPage() {
                   </div>
                 </div>
 
-                <TabsContent value="all" className="mt-6">
+                <TabsContent value={filter} className="mt-6">
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {problems.map((problem) => (
                       <Link

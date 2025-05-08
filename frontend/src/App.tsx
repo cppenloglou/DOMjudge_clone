@@ -4,36 +4,45 @@ import ProblemsPage from "./screens/Problems";
 import RegisterPage from "./screens/Register";
 import TeamRegistrationPage from "./screens/Register";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import ProblemPage from "./screens/ProblemPage";
 import PageLayout from "./layouts/PageLayout";
-import { PageProvider } from "./context/PageContext";
+import SubmissionLayout from "./layouts/SubmissionLayout";
+import NavbarLayout from "./layouts/NavBarLayout";
+import ScoreboardPage from "./screens/Scoreboard";
+import TeamLayout from "./layouts/TeamLayout";
+import AdminPage from "./screens/AdminPage";
+import AdminRoute from "./utils/AdminRoute";
 
 function App() {
   return (
-    <PageProvider>
-      {/* <ProblemProvider> */}
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route element={<ProtectedRoutes />}>
-            <Route path="/" element={<Home />} />
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-            <Route element={<PageLayout />}>
-              <Route path="/problems" element={<ProblemsPage />} />
+      <Route element={<ProtectedRoutes />}>
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminPage />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoutes />}>
+        <Route element={<NavbarLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route element={<PageLayout />}>
+            <Route path="/problems" element={<ProblemsPage />} />
+            <Route element={<TeamLayout />}>
+              <Route path="/scoreboard" element={<ScoreboardPage />} />
+            </Route>
+            <Route element={<SubmissionLayout />}>
               <Route path="/problems/:id" element={<ProblemPage />} />
             </Route>
-
-            <Route
-              path="/team-registration"
-              element={<TeamRegistrationPage />}
-            />
           </Route>
-        </Routes>
-      </BrowserRouter>
-      {/* </ProblemProvider> */}
-    </PageProvider>
+        </Route>
+
+        <Route path="/team-registration" element={<TeamRegistrationPage />} />
+      </Route>
+    </Routes>
   );
 }
 

@@ -1,6 +1,5 @@
 # Use an openjdk base image for Java
-FROM openjdk:11-jre-slim
-
+FROM openjdk:11-jdk-slim
 # Install dependencies for FastAPI and Python
 RUN apt-get update && apt-get install -y python3-pip
 

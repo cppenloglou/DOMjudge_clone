@@ -13,36 +13,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Award } from "lucide-react";
-import axios from "axios";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-
-const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
+import { useTimer } from "@/context/TimerContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
+  const { setIsCountdownActive } = useTimer();
   const navigate = useNavigate();
-
-  const loginUser = async (username: string, password: string) => {
-    try {
-      const response = await axios.post(
-        `${API_URL}/login`,
-        { username, password },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      login(response.data);
-    } catch (error) {
-      console.error("Login error:", error);
-      throw new Error("Login failed");
-    }
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,10 +38,13 @@ export default function LoginPage() {
       return;
     }
     try {
-      await loginUser(email, password);
+      const response = await login(email, password);
+      console.log("response:", response);
+      setIsCountdownActive(true);
       navigate("/", { replace: true });
     } catch (err) {
-      alert("Login failed. Please check your credentials.");
+      alert(err);
+      console.log("ERR", err);
     }
   };
 
