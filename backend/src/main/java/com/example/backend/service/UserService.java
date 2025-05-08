@@ -10,8 +10,6 @@ import com.example.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,11 +35,9 @@ public class UserService {
     private final TeamService teamService;
     private final CountdownService countdownService;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     public Map<String, Object> authenticate(LoginDto loginDto) throws UsernameNotFoundException {
         User user = (User) userDetailsService.loadUserByUsername(loginDto.getUsername());
-        logger.info("Username {} found", loginDto.getUsername());
+
         Optional<String> role = user.getRoles().stream().findFirst();
         if(role.isEmpty()) {
             throw new UsernameNotFoundException("Invalid username or password");

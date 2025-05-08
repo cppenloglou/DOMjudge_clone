@@ -32,9 +32,7 @@ public class AuthController {
     private final UserService userService;
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) throws UsernameNotFoundException {
-        logger.info("Login Request");
         var authenticationDetails = userService.authenticate(loginDto);
-        logger.info("Login Authentication Response");
         if(authenticationDetails != null && !authenticationDetails.isEmpty()){
             return ResponseEntity.ok()
                     .header("Authorization", "Bearer " + authenticationDetails.get("access_token"))
@@ -48,8 +46,7 @@ public class AuthController {
                     );
         }
         if(!countdownService.isCountdownActive())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The contest doesn't start yet!");
-        logger.info("Login Unauthorized");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The contest hasn't started yet!");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Username or Password");
     }
 

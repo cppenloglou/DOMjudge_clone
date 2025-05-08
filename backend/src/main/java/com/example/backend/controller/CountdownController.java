@@ -1,14 +1,13 @@
 package com.example.backend.controller;
 
 import com.example.backend.service.CountdownService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/clock")
+@Slf4j
 public class CountdownController {
 
     private final CountdownService countdownService;
@@ -20,8 +19,12 @@ public class CountdownController {
 
     // Endpoint to start the countdown
     @PostMapping("/start-countdown")
-    public String startCountdown() {
-        countdownService.startCountdown();
+    public String startCountdown(
+            @RequestParam(defaultValue = "3", name = "h") int hours,
+            @RequestParam(defaultValue = "0", name = "m") int minutes
+    ) {
+        log.info("Starting countdown with hours: {} and minutes: {}", hours, minutes);
+        countdownService.startCountdown(hours, minutes);
         return "Countdown started successfully";
     }
 

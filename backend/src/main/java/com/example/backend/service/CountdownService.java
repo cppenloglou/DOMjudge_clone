@@ -12,11 +12,12 @@ import java.time.Instant;
 public class CountdownService {
 
     private Instant countdownStartTime;
-    private final Duration countdownDuration = Duration.ofHours(3);
+    private Duration countdownDuration;
     private boolean isCountingDown = false;
 
     // Start the countdown when called by admin
-    public void startCountdown() {
+    public void startCountdown(int hours, int minutes) {
+        countdownDuration = Duration.ofHours(hours).plusMinutes(minutes);
         countdownStartTime = Instant.now();
         isCountingDown = true;
     }
