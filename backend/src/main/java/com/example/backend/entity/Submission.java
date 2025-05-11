@@ -18,6 +18,7 @@ public class Submission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
     @Column(nullable = false, updatable = false)
     private Instant timestamp = Instant.now(); // Auto-set to creation time
 

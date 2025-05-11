@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @JoinColumn(name = "team_id", referencedColumnName = "id")
+    @JoinColumn(name = "team_id", referencedColumnName = "id", nullable = true)
     @OneToOne
     private Team team;
 

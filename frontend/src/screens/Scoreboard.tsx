@@ -25,23 +25,36 @@ import { CheckCircle2, Clock, Medal, Trophy, XCircle } from "lucide-react";
 import { useProblems } from "@/context/ProblemContext";
 import { useTeams } from "@/context/TeamContext";
 import { useEffect } from "react";
+import Loading from "@/screens/loading";
+import { useTimer } from "@/context/TimerContext";
 
 export default function ScoreboardPage() {
-  const { problems } = useProblems();
-  const { teams, calculateTotalProblemsTime, fetchTeams } = useTeams();
+  const { problems, problemCount, fetchProblems } = useProblems();
+  const { teams, loading, calculateTotalProblemsTime, fetchTeams } = useTeams();
+  const { isCountdownActive, remainingSeconds, formatSeconds } = useTimer();
 
   useEffect(() => {
+    fetchProblems(0, problemCount, "all");
     const interval = setInterval(() => {
       fetchTeams();
     }, 60000);
     return () => clearInterval(interval);
   }, [fetchTeams]);
 
-  // Format time (minutes) to hours and minutes
+  // Format time (minutes) to hours and minutes with a max of 3 digits after decimal
   const formatTime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+    // Ensure the number has a maximum of 3 digits after decimal point
+    const formattedMinutes = parseFloat(minutes.toFixed(3));
+
+    const hours = Math.floor(formattedMinutes / 60);
+    const mins = formattedMinutes % 60;
+
+    // Format mins to have a maximum of 3 decimal places
+    const formattedMins = mins.toFixed(
+      Math.min(3, (mins.toString().split(".")[1] || "").length)
+    );
+
+    return hours > 0 ? `${hours}h ${formattedMins}m` : `${formattedMins}m`;
   };
 
   // Get cell color based on problem status
@@ -55,6 +68,8 @@ export default function ScoreboardPage() {
         return "";
     }
   };
+
+  if (loading) return <Loading size="large" overlay={true} />;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -73,9 +88,28 @@ export default function ScoreboardPage() {
                 <Trophy className="h-5 w-5 text-primary" />
                 <span>ICPC Regional 2025 - Final Standings</span>
               </CardTitle>
-              <CardDescription>
-                Contest duration: 5 hours • Problems: A-H • Teams:{" "}
-                {teams.length}
+              <CardDescription className="text-sm flex items-center gap-2 flex-wrap">
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Contest duration:</span>
+                  {isCountdownActive ? (
+                    <>
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>{formatSeconds(remainingSeconds)}</span>
+                    </>
+                  ) : (
+                    <span className="italic">Not Active</span>
+                  )}
+                </span>
+                <span className="hidden sm:inline">•</span>
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Problems:</span>
+                  <span>1-{problemCount}</span>
+                </span>
+                <span className="hidden sm:inline">•</span>
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Teams:</span>
+                  <span>{teams.length}</span>
+                </span>
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
@@ -102,7 +136,10 @@ export default function ScoreboardPage() {
                   </TableHeader>
                   <TableBody>
                     {teams.map((team) => (
-                      <TableRow key={team.id} className="hover:bg-muted/50">
+                      <TableRow
+                        key={team.team_id}
+                        className="hover:bg-muted/50"
+                      >
                         <TableCell className="font-medium text-center">
                           {team.rank <= 3 ? (
                             <div className="flex justify-center">
@@ -172,7 +209,7 @@ export default function ScoreboardPage() {
                                         </span>
                                         <span className="text-xs flex items-center gap-1">
                                           <Clock className="h-3 w-3" />
-                                          {problem.time}
+                                          {parseFloat(problem.time.toFixed(3))}
                                         </span>
                                       </div>
                                     ) : problem.status === "Attempted" ? (
@@ -188,7 +225,9 @@ export default function ScoreboardPage() {
                                       <div className="flex items-center gap-2">
                                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                                         <span>
-                                          Solved in {problem.time} minutes
+                                          Solved in{" "}
+                                          {parseFloat(problem.time.toFixed(3))}{" "}
+                                          minutes
                                           {problem.attempts > 1
                                             ? ` with ${problem.attempts} attempts`
                                             : ""}

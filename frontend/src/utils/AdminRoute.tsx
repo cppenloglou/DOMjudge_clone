@@ -1,11 +1,12 @@
 import { useAuth } from "@/context/AuthContext";
 import { Navigate, Outlet } from "react-router-dom";
+import Loading from "@/screens/loading";
 
 const AdminRoute = () => {
   const { loading, token, role } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading size="large" overlay={true} />;
   }
 
   if (!token || role !== "ROLE_ADMIN") {

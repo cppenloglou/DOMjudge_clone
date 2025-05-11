@@ -13,6 +13,7 @@ import { Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSubmission } from "@/context/SubmissionContext";
 import { useProblems } from "@/context/ProblemContext";
+import Loading from "@/screens/loading";
 
 type SubmissionDetails = {
   status: string;
@@ -50,9 +51,14 @@ const getStatusBadgeColor = (status: string) => {
 };
 
 export default function ProblemPage() {
-  const { submissions, setSubmissions, fetchSubmissions, submit } =
-    useSubmission();
-  const { getProlemById } = useProblems();
+  const {
+    submissions,
+    setSubmissions,
+    fetchSubmissions,
+    submit,
+    loading: submissionLoading,
+  } = useSubmission();
+  const { getProblemById, loading: problemLoading } = useProblems();
   const { id } = useParams<{ id: string }>();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -60,6 +66,7 @@ export default function ProblemPage() {
   const [submissionDetails, setSubmissionDetails] =
     useState<SubmissionDetails | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submissionsPerPage = 5;
   const totalPages = Math.ceil(submissions.length / submissionsPerPage);
@@ -68,11 +75,13 @@ export default function ProblemPage() {
     currentPage * submissionsPerPage
   );
 
-  const problem = id ? getProlemById(id) : null;
+  const problem = id ? getProblemById(id) : null;
+  const loading = problemLoading || submissionLoading;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
+      setUploadFeedback(null);
     }
   };
 
@@ -85,6 +94,7 @@ export default function ProblemPage() {
   const handleFileUpload = () => {
     if (!selectedFile || !problem) return;
 
+    setIsSubmitting(true);
     submit(problem.id, selectedFile).then((response) => {
       if (response) {
         setSubmissionDetails(response);
@@ -93,8 +103,13 @@ export default function ProblemPage() {
       } else {
         setUploadFeedback("❌ File upload failed");
       }
+      setIsSubmitting(false);
     });
   };
+
+  if (loading) {
+    return <Loading size="large" overlay={true} />;
+  }
 
   if (!problem) {
     return (
@@ -174,11 +189,18 @@ export default function ProblemPage() {
                 </CardContent>
                 <CardFooter>
                   <Button
-                    className="w-full"
+                    className="w-full relative"
                     onClick={handleFileUpload}
-                    disabled={!selectedFile}
+                    disabled={!selectedFile || isSubmitting}
                   >
-                    Submit Solution
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loading size="small" text="" />
+                        Processing...
+                      </span>
+                    ) : (
+                      "Submit Solution"
+                    )}
                   </Button>
                 </CardFooter>
               </Card>

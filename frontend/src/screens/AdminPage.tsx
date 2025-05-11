@@ -17,6 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { useTimer } from "@/context/TimerContext";
 import { useNavigate } from "react-router-dom";
+import Loading from "./loading";
 // Sample contests
 const contests = [
   { id: "icpc2025", name: "ICPC Regional 2025" },
@@ -35,16 +36,15 @@ export default function AdminPage() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const {
-    setIsCountdownActive,
     remainingSeconds,
     isCountdownActive,
     formatSeconds,
     startTimer,
+    loading,
   } = useTimer();
 
   const handleLogout = () => {
     logout();
-    setIsCountdownActive(false);
     navigate("/login");
   };
 
@@ -62,6 +62,8 @@ export default function AdminPage() {
       setShowSuccess(false);
     }, 3000);
   };
+
+  if (loading) return <Loading size="large" overlay={true} />;
 
   return (
     <div className="min-h-screen flex flex-col">

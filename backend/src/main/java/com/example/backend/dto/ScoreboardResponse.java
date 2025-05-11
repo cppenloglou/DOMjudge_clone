@@ -16,6 +16,7 @@ public class ScoreboardResponse {
     private Long rank;
     private String name;
     private String university;
+    private String members;
     private Long solved;
     private List<ProblemScoreboard> problems;
 }

@@ -19,6 +19,10 @@ public class ScoreboardController {
 
     @GetMapping
     public ResponseEntity<List<ScoreboardResponse>> getScoreboard() {
-        return ResponseEntity.ok().body(scoreboardService.getScoreboard());
+        return ResponseEntity.ok().body(
+                scoreboardService.removeAdminTeamByFinalResponse(
+                        scoreboardService.getScoreboard()
+                )
+        );
     }
 }

@@ -8,10 +8,7 @@ import React, {
   SetStateAction,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import API from "@/services/api";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
+import { authService } from "@/services/apiServices";
 
 export type RoleType = "ROLE_USER" | "ROLE_ADMIN" | null;
 
@@ -40,7 +37,9 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  token: null,
+  get token() {
+    return localStorage.getItem("token");
+  },
   login: () => {},
   logout: () => {},
   loading: false,
@@ -51,18 +50,11 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
-  const [refreshToken, setRefreshToken] = useState<string | null>(
-    localStorage.getItem("refreshToken")
-  );
   const [role, setRoleState] = useState<RoleType>(() => {
     return (localStorage.getItem("role") as RoleType) || null;
   });
 
   const setRole: Dispatch<SetStateAction<RoleType>> = (newRole) => {
-    console.log(newRole);
     setRoleState(newRole);
     if (typeof newRole === "string") {
       localStorage.setItem("role", newRole);
@@ -85,24 +77,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     if (token) {
       if (isTokenExpired(token)) {
         refresh();
       }
     }
     setLoading(false);
-  }, [token]);
+  }, []);
 
   const refresh = () => {
     setLoading(true);
-    axios
-      .post(`${API_URL}/refresh`, refreshToken, { withCredentials: true })
+    authService
+      .refresh(localStorage.getItem("refreshToken"))
       .then((response) => {
         const newToken = response.data.accessToken;
         const newRefreshToken = response.data.refreshToken;
-
-        setToken(newToken);
-        setRefreshToken(newRefreshToken);
 
         localStorage.setItem("token", newToken);
         localStorage.setItem("refreshToken", newRefreshToken);
@@ -117,31 +107,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const login = async (username: string, password: string) => {
-    const response = await axios
-      .post(
-        `${API_URL}/login`,
-        { username, password },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
+    return await authService
+      .login(username, password)
       .then(function (response) {
         setLoading(true);
-        setToken(response.data.accessToken);
-        setRefreshToken(response.data.refreshToken);
+        localStorage.setItem("token", response.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
         setRoleState(response.data.user.roles[0]);
-
-        console.log("Login data:", response.data);
-
-        if (response.data.accessToken && response.data.refreshToken) {
-          localStorage.setItem("refreshToken", response.data.refreshToken);
-          localStorage.setItem("token", response.data.accessToken);
-          localStorage.setItem("role", response.data.user.roles[0]);
-        }
-
+        localStorage.setItem("role", response.data.user.roles[0]);
         setLoading(false);
       })
       .catch(function (error) {
@@ -152,33 +125,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         ) {
           console.log(error);
           throw new Error(error.response.data);
-          return error.response.data;
         } else if (error.response.status === 401) {
           throw new Error("Login Failed check credentials");
         }
       });
-    return response;
   };
 
   const logout = async () => {
     try {
-      await API.post(`${API_URL}/logout`, refreshToken);
+      await authService.logout(localStorage.getItem("refreshToken"));
+      console.log("Logout successful");
     } catch (error) {
       console.error("Logout error:", error);
       throw new Error("Logout failed");
     }
 
-    setToken(null);
-    setRefreshToken(null);
-    setRole(null);
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    setRoleState(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{ token, login, logout, loading, role, setRole }}
+      value={{
+        get token() {
+          return localStorage.getItem("token");
+        },
+        login,
+        logout,
+        loading,
+        role,
+        setRole,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,12 +1,13 @@
 import { useAuth } from "@/context/AuthContext";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
+import Loading from "@/screens/loading";
 
 const ProtectedRoutes = () => {
-  const { loading, token, role } = useAuth(); // role is now from merged AuthContext
+  const { loading, token, role } = useAuth();
   const location = useLocation();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading size="large" overlay={true} />;
   }
 
   if (!token) {

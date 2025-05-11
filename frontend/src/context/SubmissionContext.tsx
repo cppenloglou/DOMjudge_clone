@@ -1,8 +1,6 @@
-import API from "@/services/api";
 import { jwtDecode } from "jwt-decode";
 import { createContext, useContext, useState } from "react";
-
-const API_URL = import.meta.env.VITE_APP_BASE_URL;
+import { submissionsService } from "@/services/apiServices";
 
 export type Submission = {
   avgTime: number;
@@ -17,6 +15,7 @@ type SubmissionContextType = {
   setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>>;
   fetchSubmissions: (problemId: string) => Promise<void>;
   submit: (problemId: string, selectedFile: File) => Promise<Submission>;
+  loading: boolean;
 };
 
 // ✅ Fix: Provide correct default functions that match types
@@ -33,6 +32,7 @@ export const SubmissionContext = createContext<SubmissionContextType>({
       executionLog: "",
     };
   },
+  loading: false,
 });
 
 export const SubmissionProvider = ({
@@ -41,55 +41,60 @@ export const SubmissionProvider = ({
   children: React.ReactNode;
 }) => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  //   useEffect(() => {
-  //     fetchSubmissions();
-  //   }, []);
-
-  // ✅ Fixed: This now returns Promise<Submission>
+  // Submission function
   async function submit(
     problemId: string,
     selectedFile: File
   ): Promise<Submission> {
-    const formData = new FormData();
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No token found");
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
 
-    const decoded = jwtDecode<{ team_id: number }>(token);
-    const team_id = decoded.team_id;
+      const decoded = jwtDecode<{ team_id: number }>(token);
+      const team_id = decoded.team_id;
 
-    formData.append("problemId", problemId);
-    formData.append("codeFile", selectedFile);
-    formData.append("teamId", (team_id || "").toString());
+      const response = await submissionsService.submit(
+        problemId,
+        selectedFile,
+        team_id.toString()
+      );
 
-    const response = await API.post(`${API_URL}/submissions/submit`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    // ✅ Ensure response data matches Submission type
-    return response.data as Submission;
+      return response.data as Submission;
+    } catch (error) {
+      console.error("Error submitting solution:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }
 
-  // ✅ Fixed: return Promise<void>
+  // Fetch submissions function by problemId
   async function fetchSubmissions(problemId: string): Promise<void> {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No token found");
-    const decoded = jwtDecode<{ team_id: number }>(token);
-
+    setLoading(true);
     try {
-      const res = await API.get(
-        `${API_URL}/submissions/problem/${problemId}/team/${decoded.team_id}`
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+      const decoded = jwtDecode<{ team_id: number }>(token);
+
+      const res = await submissionsService.getSubmissionsByProblemAndTeam(
+        problemId,
+        decoded.team_id.toString()
       );
       console.log("Submissions fetched successfully:", res.data);
       setSubmissions(res.data);
     } catch (err) {
       console.error("Error fetching submissions:", err);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <SubmissionContext.Provider
-      value={{ submissions, setSubmissions, fetchSubmissions, submit }}
+      value={{ submissions, setSubmissions, fetchSubmissions, submit, loading }}
     >
       {children}
     </SubmissionContext.Provider>

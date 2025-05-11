@@ -3,6 +3,7 @@ import Login from "./screens/Login";
 import ProblemsPage from "./screens/Problems";
 import RegisterPage from "./screens/Register";
 import TeamRegistrationPage from "./screens/Register";
+import ProfilePage from "./screens/Profile";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { Route, Routes } from "react-router-dom";
 import ProblemPage from "./screens/ProblemPage";
@@ -29,6 +30,7 @@ function App() {
       <Route element={<ProtectedRoutes />}>
         <Route element={<NavbarLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route element={<PageLayout />}>
             <Route path="/problems" element={<ProblemsPage />} />
             <Route element={<TeamLayout />}>
@@ -39,7 +41,6 @@ function App() {
             </Route>
           </Route>
         </Route>
-
         <Route path="/team-registration" element={<TeamRegistrationPage />} />
       </Route>
     </Routes>

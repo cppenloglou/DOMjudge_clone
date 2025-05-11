@@ -31,6 +31,11 @@ public class ScoreboardService {
         this.problemRepository = problemRepository;
     }
 
+    public List<ScoreboardResponse> removeAdminTeamByFinalResponse(List<ScoreboardResponse> finalResponse) {
+        finalResponse.removeIf(scoreboardResponse -> scoreboardResponse.getName().equals("Admin Team"));
+        return finalResponse;
+    }
+
     public List<ScoreboardResponse> getScoreboard() {
         List<ProblemService.TeamRank> teamRanks = problemService.getTeamRanking();
         return teamRepository.findAll().stream().map(team -> {
@@ -49,6 +54,7 @@ public class ScoreboardService {
                     .solved(solved)
                     .university(team.getUniversity())
                     .name(team.getName())
+                    .members(team.getMembers())
                     .problems(getProblemScoreboard(team.getId()))
                     .build();
         }).collect(Collectors.toList());

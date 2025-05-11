@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   Award,
-  Bell,
   ChevronDown,
   Clock,
   Code,
@@ -11,7 +10,7 @@ import {
   Menu,
   MessageSquare,
   Users,
-  X,
+  LogOut,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -55,8 +54,8 @@ export function Navbar() {
                 <span className="sr-only">Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] sm:w-[350px]">
-              <div className="flex flex-col gap-6">
+            <SheetContent side="left" className="w-[280px] sm:w-[300px]">
+              <div className="flex flex-col gap-8 mx-5 my-3">
                 <div className="flex items-center justify-between">
                   <Link
                     to="/"
@@ -66,24 +65,22 @@ export function Navbar() {
                     <Award className="h-6 w-6 text-primary" />
                     <span>CodeJudge</span>
                   </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
+                </div>
+                <nav className="flex flex-col gap-4 border-b pb-6">
+                  <h4 className="text-sm font-semibold text-muted-foreground px-1">
+                    <span>Navigation</span>
+                  </h4>
+                  <Link
+                    to="/problems"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-                <nav className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <Code className="h-4 w-4" />
-                      <span>Problems</span>
-                    </div>
-                  </div>
+                    <Code className="h-4 w-4" />
+                    <span>Problems</span>
+                  </Link>
                   <Link
                     to="/scoreboard"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <Award className="h-4 w-4" />
@@ -91,7 +88,7 @@ export function Navbar() {
                   </Link>
                   <Link
                     to="/clarifications"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <MessageSquare className="h-4 w-4" />
@@ -99,7 +96,7 @@ export function Navbar() {
                   </Link>
                   <Link
                     to="/teams"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <Users className="h-4 w-4" />
@@ -107,43 +104,22 @@ export function Navbar() {
                   </Link>
                   <Link
                     to="/docs"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <FileText className="h-4 w-4" />
                     <span>Docs</span>
                   </Link>
                 </nav>
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
-                        JS
-                      </div>
-                      <span className="text-sm font-medium">Team Alpha</span>
-                    </div>
-                    <div className="flex flex-col gap-2 pl-8">
-                      <Link
-                        to="/profile"
-                        className="text-sm text-muted-foreground hover:text-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        to="/settings"
-                        className="text-sm text-muted-foreground hover:text-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Settings
-                      </Link>
-                      <button
-                        className="text-left text-sm text-muted-foreground hover:text-foreground"
-                        onClick={handleLogout}
-                      >
-                        Logout
-                      </button>
-                    </div>
+                <div className="flex flex-col gap-4 pb-6">
+                  <div className="flex flex-col gap-3 pl-1">
+                    <button
+                      className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -163,16 +139,16 @@ export function Navbar() {
               <li>
                 <Link
                   to="/problems"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <Award className="h-4 w-4" />
+                  <Code className="h-4 w-4" />
                   <span>Problems</span>
                 </Link>
               </li>
               <li>
                 <Link
                   to="/scoreboard"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Award className="h-4 w-4" />
                   <span>Scoreboard</span>
@@ -181,7 +157,7 @@ export function Navbar() {
               <li>
                 <Link
                   to="/clarifications"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <MessageSquare className="h-4 w-4" />
                   <span>Clarifications</span>
@@ -190,7 +166,7 @@ export function Navbar() {
               <li>
                 <Link
                   to="/teams"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Users className="h-4 w-4" />
                   <span>Teams</span>
@@ -199,7 +175,7 @@ export function Navbar() {
               <li>
                 <Link
                   to="/docs"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <FileText className="h-4 w-4" />
                   <span>Docs</span>
@@ -221,16 +197,6 @@ export function Navbar() {
             </span>
           </div>
 
-          {/* Notification bell - hidden on smallest screens */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 hidden sm:flex"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-          </Button>
-
           {/* User dropdown - adaptive display */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -247,9 +213,6 @@ export function Navbar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/profile">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/settings">Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>

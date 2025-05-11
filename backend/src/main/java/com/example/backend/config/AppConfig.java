@@ -16,16 +16,18 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Configuration
-public class AppConfig  {
+public class AppConfig {
 
     private final UserRepository userRepository;
 
     public AppConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
@@ -35,14 +37,15 @@ public class AppConfig  {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        var daoAuthenticationProvider = new DaoAuthenticationProvider(passwordEncoder());
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
         return daoAuthenticationProvider;
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
-        try{
+        try {
             return config.getAuthenticationManager();
         } catch (Exception e) {
             log.info("Error getting authentication manager, Throwing exception again");
