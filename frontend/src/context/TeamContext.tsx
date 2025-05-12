@@ -1,13 +1,12 @@
+import API from "@/services/api";
 import { createContext, useContext, useEffect, useState } from "react";
 import { teamsService } from "@/services/apiServices";
-import { useAuth } from "./AuthContext";
 
 export type TeamInfo = {
-  team_id: number;
+  id: number;
   rank: number;
   name: string;
   university: string;
-  members: string;
   solved: number;
   problems: ProblemScroreboard[];
 };
@@ -36,34 +35,22 @@ export const TeamContext = createContext<TeamContextType>({
 export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
   const [teams, setTeams] = useState<TeamInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const { token } = useAuth();
+
+  const API_URL = import.meta.env.VITE_APP_BASE_URL;
 
   useEffect(() => {
-    setLoading(true);
-    if (!token) return;
+    // setTeams(temp_teams);
     fetchTeams();
-    setLoading(false);
   }, []);
 
-  // Fetch teams from backend
-  // This function fetches the teams from the backend and sets the teams state
-  // with the response data. It also handles loading state and errors.
-  // It uses the teamsService to make the API call.
-  // The function is called when the component mounts and whenever the
-  // fetchTeams function is called.
   const fetchTeams = async () => {
     setLoading(true);
-    if (!token) return;
-    console.log("Fetching teams...");
     teamsService
       .getScoreboard()
-      .then((response) => {
-        // Sort teams by rank first
-        const sortedTeams = [...response.data].sort((a, b) => a.rank - b.rank);
-        setTeams(sortedTeams);
-        console.log("Teams fetched successfully:", sortedTeams);
+      .then((reponse) => {
+        setTeams(reponse.data);
       })
-      .catch((error: unknown) => {
+      .catch((error) => {
         console.error("Error fetching teams:", error);
       })
       .finally(() => {
@@ -72,7 +59,6 @@ export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const calculateTotalProblemsTime = (team: TeamInfo): number => {
-    if (!token) return 0;
     return team.problems.reduce((sum, problem) => sum + problem.time, 0);
   };
 

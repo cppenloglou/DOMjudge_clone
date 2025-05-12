@@ -25,7 +25,6 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePage } from "@/context/PageContext";
 import { useProblems } from "@/context/ProblemContext";
-import Loading from "@/screens/loading";
 
 export default function ProblemsPage() {
   const [filter, setFilter] = useState<"all" | "solved" | "unsolved">("all");
@@ -35,8 +34,6 @@ export default function ProblemsPage() {
   const { currentPage, setCurrentPage, itemsPerPage } = usePage();
 
   useEffect(() => {
-    console.log("Fetching problems...");
-    console.log("Current page:", currentPage);
     fetchProblems(currentPage - 1, itemsPerPage, filter);
   }, [currentPage, filter]);
 
@@ -45,8 +42,6 @@ export default function ProblemsPage() {
   }, [filter]);
 
   // Calculate the total number of pages
-  console.log("Problem count:", problemCount);
-  console.log("Items per page:", itemsPerPage);
   const totalPages = Math.ceil(problemCount / itemsPerPage);
   const maxPagesToShow = 10;
 
@@ -65,7 +60,7 @@ export default function ProblemsPage() {
 
   const visiblePages = getVisiblePages();
 
-  if (loading) return <Loading size="large" overlay={true} />;
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -211,8 +206,6 @@ export default function ProblemsPage() {
                           href="#"
                           onClick={(e) => {
                             e.preventDefault();
-                            console.log("Current page:", currentPage);
-                            console.log("Total pages:", totalPages);
                             if (currentPage < totalPages)
                               setCurrentPage((prev) => prev + 1);
                           }}

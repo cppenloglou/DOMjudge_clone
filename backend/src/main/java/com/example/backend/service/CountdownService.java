@@ -22,6 +22,13 @@ public class CountdownService {
         isCountingDown = true;
     }
 
+    // Cancel the countdown manually
+    public void cancelCountdown() {
+        isCountingDown = false;
+        countdownStartTime = null;
+        countdownDuration = null;
+    }
+
     // Scheduled task to update the countdown every second
     @Scheduled(fixedRate = 1000) // Update every second
     public void updateCountdown() {

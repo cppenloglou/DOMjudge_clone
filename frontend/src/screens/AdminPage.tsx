@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,7 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { useTimer } from "@/context/TimerContext";
 import { useNavigate } from "react-router-dom";
-import Loading from "./loading";
+import { timerService } from "@/services/apiServices";
 // Sample contests
 const contests = [
   { id: "icpc2025", name: "ICPC Regional 2025" },
@@ -36,16 +36,24 @@ export default function AdminPage() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const {
+    setIsCountdownActive,
     remainingSeconds,
     isCountdownActive,
     formatSeconds,
     startTimer,
-    loading,
+    cancelTimer,
   } = useTimer();
 
   const handleLogout = () => {
     logout();
+    setIsCountdownActive(false);
     navigate("/login");
+  };
+
+  // Handle timer cancel
+  const handleCancelTimer = () => {
+    cancelTimer();
+    setIsCountdownActive(false);
   };
 
   // Handle timer start
@@ -63,7 +71,11 @@ export default function AdminPage() {
     }, 3000);
   };
 
-  if (loading) return <Loading size="large" overlay={true} />;
+  useLayoutEffect(() => {
+    timerService.isCountdownActive().then((res) => {
+      setIsCountdownActive(res.data);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -155,15 +167,27 @@ export default function AdminPage() {
                   Start Timer
                 </Button>
               ) : (
-                <Button
-                  className="w-full sm:w-auto flex items-center gap-2"
-                  variant="outline"
-                  onClick={handleStartTimer}
-                  disabled={!remainingSeconds}
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Reset Timer
-                </Button>
+                <>
+                  <Button
+                    className="w-full sm:w-auto flex items-center gap-2"
+                    variant="outline"
+                    onClick={handleStartTimer}
+                    disabled={!remainingSeconds}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Reset Timer
+                  </Button>
+
+                  {/* ✅ Cancel Timer button */}
+                  <Button
+                    className="w-full sm:w-auto flex items-center gap-2"
+                    variant="destructive"
+                    onClick={handleCancelTimer}
+                  >
+                    <ShieldAlert className="h-4 w-4" />
+                    Cancel Timer
+                  </Button>
+                </>
               )}
             </CardFooter>
           </Card>

@@ -26,6 +26,12 @@ public class CountdownController {
         return "Countdown started successfully";
     }
 
+    @PostMapping("/cancel-countdown")
+    public void cancelCountdown() {
+        log.info("Canceling countdown...");
+        countdownService.cancelCountdown();
+    }
+
     // Endpoint to check the remaining time
     @GetMapping("/remaining-time")
     public String getRemainingTime() {

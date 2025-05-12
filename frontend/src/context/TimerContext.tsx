@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { timerService } from "@/services/apiServices";
 import { useAuth } from "./AuthContext";
 
@@ -16,94 +10,59 @@ type TimerContextType = {
   isCountdownActive: boolean;
   formatSeconds: (totalSeconds: number) => string;
   startTimer: (h: number, m: number) => {};
+  cancelTimer: () => {};
   loading: boolean;
-  getRemainingSeconds: () => void;
 };
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
-  const token = useAuth();
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Fetch remaining seconds from backend
-  // This function fetches the remaining seconds from the backend and sets the
-  // remainingSeconds state with the response data. It also handles loading
-  // state and errors. It uses the timerService to make the API call.
-  const getRemainingSeconds = () => {
-    // Only make API call if authenticated
-    if (!token) return;
+  const { logout } = useAuth();
 
+  // Fetch status from backend
+  const getRemainingSeconds = () => {
     timerService
       .getRemainingTime()
       .then((response) => {
         const data = response.data;
         setRemainingSeconds(data);
-        if (data > 0) {
-          if (isCountdownActive) {
-            setIsCountdownActive(true);
-          }
-        } else {
+        if (response.data <= 0) {
           setIsCountdownActive(false);
+          logout();
         }
       })
-      .catch((error: unknown) => {
+      .catch((error) => {
         console.error("Error fetching timer status:", error);
       });
   };
 
-  // Start timer function
-  // This function starts the timer with the given hours and minutes. It sets
-  // the loading state to true while the timer is starting. It uses the
-  // timerService to make the API call. It also handles errors and sets the
-  // loading state to false when the timer is started. It also fetches the
-  // remaining seconds from the backend and sets the isCountdownActive state
-  // to true.
-  const startTimer = async (h: number, m: number) => {
-    // Only start timer if authenticated
-    if (!token) return {};
-
-    setLoading(true);
-    await timerService
-      .startCountdown(h, m)
-      .catch((err: unknown) => {
-        console.error(err);
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-    getRemainingSeconds();
-    setIsCountdownActive(true);
+  const cancelTimer = async () => {
+    timerService.canclelCountdown().then(() => {
+      setIsCountdownActive(false);
+    });
   };
 
-  useLayoutEffect(() => {
-    // Only fetch timer data if user is authenticated
-    if (token) {
-      setLoading(true);
-      timerService
-        .isCountdownActive()
-        .then((response) => {
-          console.log("isCountdownActive", response.data);
-          setIsCountdownActive(response.data);
-        })
-        .catch((error: unknown) => {
-          console.error("Error fetching timer status:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [token]);
+  const startTimer = async (h: number, m: number) => {
+    timerService
+      .startCountdown(h, m)
+      .then(() => {
+        getRemainingSeconds();
+        setIsCountdownActive(true);
+      })
+      .catch((err) => {
+        console.error(err);
+        return;
+      });
+  };
 
   useEffect(() => {
-    // Don't run timer logic if not authenticated or timer is not active
-    if (!token || !isCountdownActive) {
+    if (!isCountdownActive) {
       return;
     }
-
     getRemainingSeconds();
 
     // Update clock every second
@@ -127,7 +86,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
       clearInterval(clockInterval);
       clearInterval(pollInterval);
     };
-  }, [isCountdownActive, token]);
+  }, [isCountdownActive]);
 
   const formatSeconds = (totalSeconds: number) => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -144,12 +103,12 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   return (
     <TimerContext.Provider
       value={{
-        getRemainingSeconds,
         remainingSeconds,
         setIsCountdownActive,
         isCountdownActive,
         formatSeconds,
         startTimer,
+        cancelTimer,
         loading,
       }}
     >
@@ -158,13 +117,10 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Define the hook separately from export to help with Fast Refresh compatibility
-function useTimerHook() {
+export function useTimer() {
   const context = useContext(TimerContext);
   if (context === undefined) {
     throw new Error("useTimer must be used within a TimerProvider");
   }
   return context;
 }
-
-export const useTimer = useTimerHook;

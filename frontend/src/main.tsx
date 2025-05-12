@@ -5,21 +5,15 @@ import { AuthProvider } from "./context/AuthContext.tsx";
 import { PageProvider } from "./context/PageContext.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { TimerProvider } from "./context/TimerContext.tsx";
-import { TeamProvider } from "./context/TeamContext.tsx";
-import { ProblemProvider } from "./context/ProblemContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <AuthProvider>
-    <PageProvider>
-      <TimerProvider>
-        <TeamProvider>
-          <ProblemProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </ProblemProvider>
-        </TeamProvider>
-      </TimerProvider>
-    </PageProvider>
+    <TimerProvider>
+      <PageProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </PageProvider>
+    </TimerProvider>
   </AuthProvider>
 );

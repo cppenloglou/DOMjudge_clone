@@ -34,10 +34,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { authService } from "@/services/apiServices";
+import axios from "axios";
 
 // Initial empty team member
 const emptyMember = { name: "" };
+
+const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
 
 export default function RegisterPage() {
   // Account information
@@ -64,17 +66,15 @@ export default function RegisterPage() {
     university: string
   ) => {
     try {
-      await authService
-        .register(email, password, teamName, members, university)
-        .then((response) => {
-          if (response.status === 200) {
-            console.log("Registration successful");
-            // Optionally, you can navigate to the login page or show a success message
-          } else {
-            console.error("Registration failed:", response.data);
-            throw new Error("Registration failed");
-          }
-        });
+      await axios.post(
+        `${API_URL}/register`,
+        { email, password, teamName, members, university },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     } catch (error) {
       console.error("Login error:", error);
       throw new Error("Login failed");

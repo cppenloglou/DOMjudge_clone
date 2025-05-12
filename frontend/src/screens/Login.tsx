@@ -15,11 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Award } from "lucide-react";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useTimer } from "@/context/TimerContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
+  const { setIsCountdownActive } = useTimer();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -36,7 +38,8 @@ export default function LoginPage() {
       return;
     }
     try {
-      await login(email, password);
+      const response = await login(email, password);
+      console.log("response:", response);
       navigate("/", { replace: true });
     } catch (err) {
       alert(err);

@@ -1,8 +1,9 @@
+// src/context/ProblemContext.tsx
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { problemsService } from "@/services/apiServices";
+import API from "@/services/api";
 import { usePage } from "@/context/PageContext";
-import { useAuth } from "./AuthContext";
+import { problemsService } from "@/services/apiServices";
 
 export type Problem = {
   id: string;
@@ -21,18 +22,18 @@ type ProblemContextType = {
     page: number,
     size: number,
     filter: "all" | "solved" | "unsolved"
-  ) => Promise<boolean | undefined>;
+  ) => void;
   problemCount: number;
-  getProblemById: (id: string) => Problem | null;
+  getProlemById: (id: string) => Problem | null;
 };
 
 export const ProblemContext = createContext<ProblemContextType>({
   problems: [],
   loading: true,
   teamId: null,
-  fetchProblems: () => Promise.resolve(false),
+  fetchProblems: () => {},
   problemCount: 0,
-  getProblemById: () => null,
+  getProlemById: () => null,
 });
 
 export const ProblemProvider = ({
@@ -45,17 +46,14 @@ export const ProblemProvider = ({
   const [teamId, setTeamId] = useState<number | null>(null);
   const [problemCount, setProblemCount] = useState<number>(0);
   const [filter, setFilter] = useState<"all" | "solved" | "unsolved">("all");
-  const token = useAuth();
 
   const { currentPage, itemsPerPage } = usePage();
 
   useEffect(() => {
-    if (!token) return;
     fetchProblems(currentPage - 1, itemsPerPage, filter);
   }, []);
 
-  const getProblemById = (id: string | null) => {
-    if (!token) return null;
+  const getProlemById = (id: string | null) => {
     console.log("problems:", problems);
 
     const problem = problems.find((problem) => problem.id == id);
@@ -79,41 +77,32 @@ export const ProblemProvider = ({
     try {
       const decoded = jwtDecode<{ team_id: number }>(token);
       const id = decoded.team_id;
-      console.log("Decoded token:", decoded);
-      console.log("Team ID:", id);
       setTeamId(id);
-      setLoading(true);
 
-      // Fetch total problems size from backend
-      // This function fetches the total number of problems from the backend
-      // and sets the problemCount state with the response data. It also handles
-      // loading state and errors. It uses the problemsService to make the API call.
-      await problemsService
+      setLoading(true);
+      problemsService
         .getProblemsSize(id, filter)
         .then((res) => {
           setProblemCount(res.data);
+          console.log("Problem count:", res.data);
         })
         .catch((err) => {
-          console.error("Error fetching total problems:", err);
-          return false;
+          console.error("Problem count fetch error:", err);
         });
 
-      // Fetch problems from backend
-      // This function fetches the problems from the backend and sets the
-      // problems state with the response data. It also handles loading
-      // state and errors. It uses the problemsService to make the API call.
-      await problemsService
+      problemsService
         .getProblems(id, page, size, filter)
         .then((res) => {
           setProblems(res.data);
-          console.log("Problems fetched successfully:", problemCount);
+          if (res.data.length < itemsPerPage && page === 0) {
+            setProblemCount(res.data.length);
+          }
+          console.log("Problems fetched successfully:", res.data.length);
         })
         .catch((err) => {
           console.error("Problem fetch error:", err);
-          return false;
         })
         .finally(() => setLoading(false));
-      return true;
     } catch (err) {
       console.error("Token decode failed:", err);
       setLoading(false);
@@ -128,7 +117,7 @@ export const ProblemProvider = ({
         teamId,
         fetchProblems,
         problemCount,
-        getProblemById,
+        getProlemById,
       }}
     >
       {children}

@@ -49,9 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String username = jwtService.extractSubject(jwtToken);
+            boolean isValid = jwtService.validateToken(jwtToken);
+            String tokenType = jwtService.extractTokenType(jwtToken);
+            logger.info("Extracted Username: " + username + ", Valid: " + isValid + ", Token Type: " + tokenType);
 
-            if (username != null && jwtService.validateToken(jwtToken) && jwtService.extractTokenType(jwtToken).equals("access_token")) {
-                logger.info("Access Token is present in request.");
+            if (username != null && isValid && tokenType.equals("access_token")) {
+                logger.info("Access Token is valid and present in request.");
                 User user = (User) userDetailsService.loadUserByUsername(username);
                 var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -3,7 +3,6 @@ import Login from "./screens/Login";
 import ProblemsPage from "./screens/Problems";
 import RegisterPage from "./screens/Register";
 import TeamRegistrationPage from "./screens/Register";
-import ProfilePage from "./screens/Profile";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { Route, Routes } from "react-router-dom";
 import ProblemPage from "./screens/ProblemPage";
@@ -14,6 +13,7 @@ import ScoreboardPage from "./screens/Scoreboard";
 import TeamLayout from "./layouts/TeamLayout";
 import AdminPage from "./screens/AdminPage";
 import AdminRoute from "./utils/AdminRoute";
+import ProfilePage from "./screens/Profile";
 
 function App() {
   return (
@@ -30,10 +30,10 @@ function App() {
       <Route element={<ProtectedRoutes />}>
         <Route element={<NavbarLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<ProfilePage />} />
           <Route element={<PageLayout />}>
             <Route path="/problems" element={<ProblemsPage />} />
             <Route element={<TeamLayout />}>
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/scoreboard" element={<ScoreboardPage />} />
             </Route>
             <Route element={<SubmissionLayout />}>
@@ -41,6 +41,7 @@ function App() {
             </Route>
           </Route>
         </Route>
+
         <Route path="/team-registration" element={<TeamRegistrationPage />} />
       </Route>
     </Routes>

@@ -79,4 +79,5 @@ export const timerService = {
     API.post(clock_path + `/start-countdown`, {}, { params: { h, m } }),
 
   isCountdownActive: () => API.get(clock_path + "/is-countdown-active"),
+  canclelCountdown: () => API.post(clock_path + "/cancel-countdown", {}, {}),
 };
