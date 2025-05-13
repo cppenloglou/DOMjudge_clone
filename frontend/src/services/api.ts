@@ -10,7 +10,7 @@ API.interceptors.request.use(
     // Skip adding auth token for authentication endpoints
     const isAuthPath = config.url && config.url.startsWith("/auth");
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token && !isAuthPath) {
       config.headers.Authorization = `Bearer ${token}`;
     }

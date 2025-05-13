@@ -6,9 +6,11 @@ import React, {
   ReactNode,
   Dispatch,
   SetStateAction,
+  useLayoutEffect,
 } from "react";
 import { jwtDecode } from "jwt-decode";
 import { authService } from "@/services/apiServices";
+import API from "@/services/api";
 
 export type RoleType = "ROLE_USER" | "ROLE_ADMIN" | null;
 
@@ -48,22 +50,21 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
+  const [token, setToken] = useState<string | null>(null); // memory only
+
   const [refreshToken, setRefreshToken] = useState<string | null>(
-    localStorage.getItem("refreshToken")
+    sessionStorage.getItem("refreshToken")
   );
   const [role, setRoleState] = useState<RoleType>(() => {
-    return (localStorage.getItem("role") as RoleType) || null;
+    return (sessionStorage.getItem("role") as RoleType) || null;
   });
 
   const setRole: Dispatch<SetStateAction<RoleType>> = (newRole) => {
     setRoleState(newRole);
     if (typeof newRole === "string") {
-      localStorage.setItem("role", newRole);
+      sessionStorage.setItem("role", newRole);
     } else {
-      localStorage.removeItem("role");
+      sessionStorage.removeItem("role");
     }
   };
 
@@ -103,10 +104,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => clearInterval(interval); // cleanup
   }, [token, refreshToken]);
 
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (token) setToken(token);
+  }, []);
+
+  useLayoutEffect(() => {
+    const initializeAuth = async () => {
+      if (!token) {
+        console.log("TOKEN does not exist refreshing...");
+        try {
+          const response = await authService.refresh();
+          setToken(response.data.accessToken);
+          console.log("TOKEN set: ", response.data.accessToken);
+        } catch (error) {
+          console.warn("User is not logged in or refresh token is invalid.");
+          setToken(null);
+        }
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
+
   const refresh = () => {
     setLoading(true);
     authService
-      .refresh(refreshToken)
+      .refresh()
       .then((response) => {
         const newToken = response.data.accessToken;
         const newRefreshToken = response.data.refreshToken;
@@ -114,8 +139,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setToken(newToken);
         setRefreshToken(newRefreshToken);
 
-        localStorage.setItem("token", newToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
+        sessionStorage.setItem("token", newToken);
+        sessionStorage.setItem("refreshToken", newRefreshToken);
       })
       .catch((error) => {
         console.error("Error refreshing token:", error);
@@ -130,21 +155,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(true);
     const response = await authService
       .login(username, password)
-      .then(function (response) {
+      .then((response) => {
         setLoading(true);
         setToken(response.data.accessToken);
         setRefreshToken(response.data.refreshToken);
         setRoleState(response.data.user.roles[0]);
 
         if (response.data.accessToken && response.data.refreshToken) {
-          localStorage.setItem("refreshToken", response.data.refreshToken);
-          localStorage.setItem("token", response.data.accessToken);
-          localStorage.setItem("role", response.data.user.roles[0]);
+          sessionStorage.setItem("refreshToken", response.data.refreshToken);
+          sessionStorage.setItem("token", response.data.accessToken);
+          sessionStorage.setItem("role", response.data.user.roles[0]);
         }
 
         setLoading(false);
       })
-      .catch(function (error) {
+      .catch((error) => {
         if (
           error.response.data &&
           error.response.data === "The contest hasn't started yet!" &&
@@ -172,9 +197,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setToken(null);
     setRefreshToken(null);
     setRole(null);
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    sessionStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("role");
+    console.log("RUN");
   };
 
   return (

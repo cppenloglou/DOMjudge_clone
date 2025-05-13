@@ -27,11 +27,11 @@ export const authService = {
 
   logout: (refreshToken: string | null) =>
     API.post(auth_path + "/logout", refreshToken, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
     }),
 
-  refresh: (refreshToken: string | null) =>
-    API.post(auth_path + "/refresh", refreshToken, { withCredentials: true }),
+  refresh: () =>
+    API.post(auth_path + "/refresh", {}, { withCredentials: true }),
 };
 
 // Submissions Service
