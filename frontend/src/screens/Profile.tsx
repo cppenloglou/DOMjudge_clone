@@ -34,15 +34,11 @@ export default function ProfilePage() {
 
   // Only run fetchTeams once on component mount
   useEffect(() => {
-    console.log("Component mounted, calling fetchTeams");
-    // Remove fetchTeams from the dependency array to avoid infinite loops
     fetchTeams();
   }, []);
 
   // This effect will run whenever the teams array changes
   useEffect(() => {
-    console.log("Teams array updated:", teams);
-
     if (!token) {
       navigate("/login");
       return;
@@ -53,9 +49,6 @@ export default function ProfilePage() {
         const decoded = jwtDecode<MyJwtPayload>(token);
         if (decoded && decoded.team_id) {
           const teamId = decoded.team_id;
-          console.log("Team ID from token:", teamId);
-          console.log("Available teams:", teams);
-          console.log("Decoded token:", 5 === teamId);
 
           const team = teams.find((team) => team.team_id === teamId);
           console.log("Found team:", team);

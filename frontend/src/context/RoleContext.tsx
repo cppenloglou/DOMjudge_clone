@@ -25,7 +25,6 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const setRole: Dispatch<SetStateAction<RoleType>> = (newRole) => {
-    console.log(newRole);
     setRoleState(newRole);
     if (typeof newRole === "string") {
       localStorage.setItem("role", newRole);

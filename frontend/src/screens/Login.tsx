@@ -38,12 +38,11 @@ export default function LoginPage() {
       return;
     }
     try {
-      const response = await login(email, password);
-      console.log("response:", response);
+      await login(email, password);
       navigate("/", { replace: true });
     } catch (err) {
       alert(err);
-      console.log("ERR", err);
+      console.error("ERR", err);
     }
   };
 

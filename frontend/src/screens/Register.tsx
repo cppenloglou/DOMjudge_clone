@@ -120,7 +120,7 @@ export default function RegisterPage() {
       await registerUser(email, password, teamName, memberNames, university);
       navigate("/login");
     } catch (err) {
-      console.log("Registration error:", err);
+      console.error("Registration error:", err);
     }
   };
 

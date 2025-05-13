@@ -6,10 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useTimer } from "@/context/TimerContext";
-import { timerService } from "@/services/apiServices";
 import { ArrowRight } from "lucide-react";
-import { useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function Home() {

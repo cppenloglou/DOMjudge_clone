@@ -1,7 +1,6 @@
 // src/context/ProblemContext.tsx
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import API from "@/services/api";
 import { usePage } from "@/context/PageContext";
 import { problemsService } from "@/services/apiServices";
 
@@ -45,23 +44,15 @@ export const ProblemProvider = ({
   const [loading, setLoading] = useState(true);
   const [teamId, setTeamId] = useState<number | null>(null);
   const [problemCount, setProblemCount] = useState<number>(0);
-  const [filter, setFilter] = useState<"all" | "solved" | "unsolved">("all");
 
-  const { currentPage, itemsPerPage } = usePage();
-
-  useEffect(() => {
-    fetchProblems(currentPage - 1, itemsPerPage, filter);
-  }, []);
+  const { itemsPerPage } = usePage();
 
   const getProlemById = (id: string | null) => {
-    console.log("problems:", problems);
-
     const problem = problems.find((problem) => problem.id == id);
     if (!problem) {
       console.error(`Problem with ID ${id} not found`);
       return null;
     }
-    console.log("Problem found:", problem);
     return problem;
   };
 
@@ -70,7 +61,6 @@ export const ProblemProvider = ({
     size: number,
     filter: "all" | "solved" | "unsolved" = "all"
   ) => {
-    setFilter(filter);
     const token = localStorage.getItem("token");
     if (!token) return;
 
@@ -84,7 +74,6 @@ export const ProblemProvider = ({
         .getProblemsSize(id, filter)
         .then((res) => {
           setProblemCount(res.data);
-          console.log("Problem count:", res.data);
         })
         .catch((err) => {
           console.error("Problem count fetch error:", err);
@@ -97,7 +86,6 @@ export const ProblemProvider = ({
           if (res.data.length < itemsPerPage && page === 0) {
             setProblemCount(res.data.length);
           }
-          console.log("Problems fetched successfully:", res.data.length);
         })
         .catch((err) => {
           console.error("Problem fetch error:", err);

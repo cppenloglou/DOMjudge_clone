@@ -1,8 +1,8 @@
-import API from "@/services/api";
 import { createContext, useContext, useEffect, useState } from "react";
 import { teamsService } from "@/services/apiServices";
 
 export type TeamInfo = {
+  team_id: number;
   id: number;
   rank: number;
   name: string;
@@ -35,8 +35,6 @@ export const TeamContext = createContext<TeamContextType>({
 export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
   const [teams, setTeams] = useState<TeamInfo[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const API_URL = import.meta.env.VITE_APP_BASE_URL;
 
   useEffect(() => {
     // setTeams(temp_teams);

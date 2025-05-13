@@ -80,7 +80,6 @@ export const SubmissionProvider = ({
       const res = await API.get(
         `${API_URL}/submissions/problem/${problemId}/team/${decoded.team_id}`
       );
-      console.log("Submissions fetched successfully:", res.data);
       setSubmissions(res.data);
     } catch (err) {
       console.error("Error fetching submissions:", err);

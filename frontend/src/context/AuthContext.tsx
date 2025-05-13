@@ -8,11 +8,7 @@ import React, {
   SetStateAction,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import API from "@/services/api";
-import axios from "axios";
 import { authService } from "@/services/apiServices";
-
-const API_URL = import.meta.env.VITE_APP_BASE_URL + "/auth";
 
 export type RoleType = "ROLE_USER" | "ROLE_ADMIN" | null;
 
@@ -63,7 +59,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   });
 
   const setRole: Dispatch<SetStateAction<RoleType>> = (newRole) => {
-    console.log(newRole);
     setRoleState(newRole);
     if (typeof newRole === "string") {
       localStorage.setItem("role", newRole);
@@ -73,11 +68,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // Function to check if the token is expired
-  const isTokenExpired = (token: string) => {
+  const isTokenExpired = (token: string, offsetSeconds = 60) => {
     try {
       const decoded: any = jwtDecode(token);
       const expiry = decoded?.exp * 1000;
-      return expiry < Date.now();
+      return expiry < Date.now() + offsetSeconds * 1000; // expire 1 minute early
     } catch (err) {
       return true;
     }
@@ -86,13 +81,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      if (isTokenExpired(token)) {
+    const checkAndRefresh = async () => {
+      if (token) {
+        if (isTokenExpired(token)) {
+          await refresh();
+        }
+      }
+      setLoading(false);
+    };
+
+    checkAndRefresh();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (token && isTokenExpired(token)) {
         refresh();
       }
-    }
-    setLoading(false);
-  }, [token]);
+    }, 60 * 1000); // check every 1 minute
+
+    return () => clearInterval(interval); // cleanup
+  }, [token, refreshToken]);
 
   const refresh = () => {
     setLoading(true);
@@ -141,7 +150,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           error.response.data === "The contest hasn't started yet!" &&
           error.response.status === 400
         ) {
-          console.log(error);
           throw new Error(error.response.data);
           return error.response.data;
         } else if (error.response.status === 401) {
