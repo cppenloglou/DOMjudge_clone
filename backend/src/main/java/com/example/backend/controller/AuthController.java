@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -93,9 +94,31 @@ public ResponseEntity<?> refreshToken(@CookieValue(name = "refreshToken", requir
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, @RequestBody String refreshToken) {
-        logger.info("Refresh token in logout: {}", refreshToken);
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+
+        String refreshToken = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refreshToken")) {
+                    refreshToken = cookie.getValue();
+                    logger.info("Refresh token from cookie: {}", refreshToken);
+                    break;
+                }
+            }
+        }
+
         userService.logout(request, refreshToken);
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Strict")
+                .maxAge(0) // Set max age to 0 to delete the cookie
+                .build();
+        
+        response.addHeader("Set-Cookie", deleteCookie.toString());
+        
         return ResponseEntity.ok("Logged Out Successfully");
     }
 }

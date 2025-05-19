@@ -27,6 +27,8 @@ import { AuthContext } from "../context/AuthContext";
 import { useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useTimer } from "@/context/TimerContext";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export function Navbar() {
   const { logout } = useContext(AuthContext);
@@ -55,6 +57,9 @@ export function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[280px] sm:w-[300px]">
+              <DialogTitle asChild>
+                <VisuallyHidden>Navigation Menu</VisuallyHidden>
+              </DialogTitle>
               <div className="flex flex-col gap-8 mx-5 my-3">
                 <div className="flex items-center justify-between">
                   <Link

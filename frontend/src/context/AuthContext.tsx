@@ -10,7 +10,6 @@ import React, {
 } from "react";
 import { jwtDecode } from "jwt-decode";
 import { authService } from "@/services/apiServices";
-import API from "@/services/api";
 
 export type RoleType = "ROLE_USER" | "ROLE_ADMIN" | null;
 
@@ -50,21 +49,20 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [token, setToken] = useState<string | null>(null); // memory only
-
-  const [refreshToken, setRefreshToken] = useState<string | null>(
-    sessionStorage.getItem("refreshToken")
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token") ? localStorage.getItem("token") : null
   );
+
   const [role, setRoleState] = useState<RoleType>(() => {
-    return (sessionStorage.getItem("role") as RoleType) || null;
+    return (localStorage.getItem("role") as RoleType) || null;
   });
 
   const setRole: Dispatch<SetStateAction<RoleType>> = (newRole) => {
     setRoleState(newRole);
     if (typeof newRole === "string") {
-      sessionStorage.setItem("role", newRole);
+      localStorage.setItem("role", newRole);
     } else {
-      sessionStorage.removeItem("role");
+      localStorage.removeItem("role");
     }
   };
 
@@ -102,10 +100,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }, 60 * 1000); // check every 1 minute
 
     return () => clearInterval(interval); // cleanup
-  }, [token, refreshToken]);
+  }, [token]);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
     if (token) setToken(token);
   }, []);
 
@@ -134,13 +132,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       .refresh()
       .then((response) => {
         const newToken = response.data.accessToken;
-        const newRefreshToken = response.data.refreshToken;
 
         setToken(newToken);
-        setRefreshToken(newRefreshToken);
 
-        sessionStorage.setItem("token", newToken);
-        sessionStorage.setItem("refreshToken", newRefreshToken);
+        localStorage.setItem("token", newToken);
       })
       .catch((error) => {
         console.error("Error refreshing token:", error);
@@ -158,13 +153,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       .then((response) => {
         setLoading(true);
         setToken(response.data.accessToken);
-        setRefreshToken(response.data.refreshToken);
         setRoleState(response.data.user.roles[0]);
 
-        if (response.data.accessToken && response.data.refreshToken) {
-          sessionStorage.setItem("refreshToken", response.data.refreshToken);
-          sessionStorage.setItem("token", response.data.accessToken);
-          sessionStorage.setItem("role", response.data.user.roles[0]);
+        if (response.data.accessToken) {
+          localStorage.setItem("token", response.data.accessToken);
+          localStorage.setItem("role", response.data.user.roles[0]);
         }
 
         setLoading(false);
@@ -189,17 +182,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await authService.logout(refreshToken);
+      await authService.logout();
     } catch (error) {
       throw new Error("Logout failed");
     }
 
     setToken(null);
-    setRefreshToken(null);
     setRole(null);
-    sessionStorage.removeItem("refreshToken");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("role");
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
     console.log("RUN");
   };
 

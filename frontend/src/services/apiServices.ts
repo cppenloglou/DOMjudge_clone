@@ -25,10 +25,14 @@ export const authService = {
       university,
     }),
 
-  logout: (refreshToken: string | null) =>
-    API.post(auth_path + "/logout", refreshToken, {
-      headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+  logout: () =>
+    API.post(auth_path + "/logout", null, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      withCredentials: true,
     }),
+    
 
   refresh: () =>
     API.post(auth_path + "/refresh", {}, { withCredentials: true }),
