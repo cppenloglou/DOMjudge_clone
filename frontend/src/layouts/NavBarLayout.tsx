@@ -14,7 +14,7 @@ export default function NavbarLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 container py-6">
+      <main className="max-w-7xl mx-auto px-4 py-8">
         <Outlet />
       </main>
     </div>

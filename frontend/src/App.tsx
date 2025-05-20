@@ -17,34 +17,36 @@ import ProfilePage from "./screens/Profile";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<RegisterPage />} />
+    <div className="min-h-screen bg-background text-foreground">
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-      <Route element={<ProtectedRoutes />}>
-        <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminPage />} />
-        </Route>
-      </Route>
-
-      <Route element={<ProtectedRoutes />}>
-        <Route element={<NavbarLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route element={<PageLayout />}>
-            <Route path="/problems" element={<ProblemsPage />} />
-            <Route element={<TeamLayout />}>
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/scoreboard" element={<ScoreboardPage />} />
-            </Route>
-            <Route element={<SubmissionLayout />}>
-              <Route path="/problems/:id" element={<ProblemPage />} />
-            </Route>
+        <Route element={<ProtectedRoutes />}>
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminPage />} />
           </Route>
         </Route>
 
-        <Route path="/team-registration" element={<TeamRegistrationPage />} />
-      </Route>
-    </Routes>
+        <Route element={<ProtectedRoutes />}>
+          <Route element={<NavbarLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route element={<PageLayout />}>
+              <Route path="/problems" element={<ProblemsPage />} />
+              <Route element={<TeamLayout />}>
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/scoreboard" element={<ScoreboardPage />} />
+              </Route>
+              <Route element={<SubmissionLayout />}>
+                <Route path="/problems/:id" element={<ProblemPage />} />
+              </Route>
+            </Route>
+          </Route>
+
+          <Route path="/team-registration" element={<TeamRegistrationPage />} />
+        </Route>
+      </Routes>
+    </div>
   );
 }
 

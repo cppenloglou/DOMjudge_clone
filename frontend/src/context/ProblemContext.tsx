@@ -1,4 +1,3 @@
-// src/context/ProblemContext.tsx
 import { createContext, useContext, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { usePage } from "@/context/PageContext";
@@ -18,12 +17,12 @@ type ProblemContextType = {
   loading: boolean;
   teamId: number | null;
   fetchProblems: (
-    page: number,
-    size: number,
-    filter: "all" | "solved" | "unsolved"
+    page?: number,
+    size?: number,
+    filter?: "all" | "solved" | "unsolved"
   ) => void;
   problemCount: number;
-  getProlemById: (id: string) => Problem | null;
+  getProblemById: (id: string) => Problem | null;
 };
 
 export const ProblemContext = createContext<ProblemContextType>({
@@ -32,7 +31,7 @@ export const ProblemContext = createContext<ProblemContextType>({
   teamId: null,
   fetchProblems: () => {},
   problemCount: 0,
-  getProlemById: () => null,
+  getProblemById: () => null,
 });
 
 export const ProblemProvider = ({
@@ -47,52 +46,61 @@ export const ProblemProvider = ({
 
   const { itemsPerPage } = usePage();
 
-  const getProlemById = (id: string | null) => {
+  const getProblemById = (id: string | null): Problem | null => {
+    if (!id) return null;
     const problem = problems.find((problem) => problem.id == id);
-    if (!problem) {
-      console.error(`Problem with ID ${id} not found`);
-      return null;
-    }
-    return problem;
+    if (!problem) console.error(`Problem with ID ${id} not found`);
+    return problem ?? null;
   };
 
-  const fetchProblems = async (
-    page: number = 0,
-    size: number,
-    filter: "all" | "solved" | "unsolved" = "all"
-  ) => {
+  const getTeamIdFromToken = (): number | null => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      console.warn("No token found in localStorage");
+      return null;
+    }
 
     try {
       const decoded = jwtDecode<{ team_id: number }>(token);
-      const id = decoded.team_id;
-      setTeamId(id);
-
-      setLoading(true);
-      problemsService
-        .getProblemsSize(id, filter)
-        .then((res) => {
-          setProblemCount(res.data);
-        })
-        .catch((err) => {
-          console.error("Problem count fetch error:", err);
-        });
-
-      problemsService
-        .getProblems(id, page, size, filter)
-        .then((res) => {
-          setProblems(res.data);
-          if (res.data.length < itemsPerPage && page === 0) {
-            setProblemCount(res.data.length);
-          }
-        })
-        .catch((err) => {
-          console.error("Problem fetch error:", err);
-        })
-        .finally(() => setLoading(false));
+      return decoded.team_id;
     } catch (err) {
       console.error("Token decode failed:", err);
+      return null;
+    }
+  };
+
+  const fetchProblems = async (
+    page = 0,
+    size?: number,
+    filter: "all" | "solved" | "unsolved" = "all"
+  ) => {
+    const id = getTeamIdFromToken();
+    if (id === null) return;
+
+    if (teamId === null) setTeamId(id);
+    setLoading(true);
+
+    try {
+      const countRes = await problemsService.getProblemsSize(id, filter);
+      const count = countRes.data;
+      setProblemCount(count);
+
+      const problemRes = await problemsService.getProblems(
+        id,
+        page,
+        size ?? count,
+        filter
+      );
+
+      const fetchedProblems = problemRes.data;
+      setProblems(fetchedProblems);
+
+      if (fetchedProblems.length < itemsPerPage && page === 0) {
+        setProblemCount(fetchedProblems.length);
+      }
+    } catch (err) {
+      console.error("Error fetching problems:", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -105,7 +113,7 @@ export const ProblemProvider = ({
         teamId,
         fetchProblems,
         problemCount,
-        getProlemById,
+        getProblemById,
       }}
     >
       {children}

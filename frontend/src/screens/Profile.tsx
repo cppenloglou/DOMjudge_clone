@@ -1,5 +1,3 @@
-"use client";
-
 import { useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -10,11 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { useTeams } from "@/context/TeamContext";
 import { AuthContext, MyJwtPayload } from "@/context/AuthContext";
 import { Award, Code, User, Users, School, Mail } from "lucide-react";
-import Loading from "./loading";
 
 interface CurrentUserTeam {
   name: string;
@@ -62,8 +60,6 @@ export default function ProfilePage() {
               email: decoded.sub,
             });
 
-            // For this example, let's add some mock team members
-            // In a real implementation, you would fetch this from an API
             setTeamMembers(
               team.members.split(",").map((member) => member.trim())
             );
@@ -77,7 +73,7 @@ export default function ProfilePage() {
     }
   }, [token, teams, navigate]);
 
-  if (loading) return <Loading size="large" overlay={true} />;
+  if (loading) return <LoadingSpinner />;
 
   if (!currentTeam) {
     return (

@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+    <main className="max-w-7xl mx-auto w-350 px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold mb-6">Welcome to CodeJudge</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>

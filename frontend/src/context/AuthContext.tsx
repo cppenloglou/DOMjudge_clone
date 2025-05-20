@@ -191,7 +191,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setRole(null);
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    console.log("RUN");
   };
 
   return (

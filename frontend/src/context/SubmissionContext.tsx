@@ -1,8 +1,6 @@
-import API from "@/services/api";
 import { jwtDecode } from "jwt-decode";
 import { createContext, useContext, useState } from "react";
-
-const API_URL = import.meta.env.VITE_APP_BASE_URL;
+import { submissionsService } from "@/services/apiServices";
 
 export type Submission = {
   avgTime: number;
@@ -51,35 +49,32 @@ export const SubmissionProvider = ({
     problemId: string,
     selectedFile: File
   ): Promise<Submission> {
-    const formData = new FormData();
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No token found");
 
     const decoded = jwtDecode<{ team_id: number }>(token);
     const team_id = decoded.team_id;
 
-    formData.append("problemId", problemId);
-    formData.append("codeFile", selectedFile);
-    formData.append("teamId", (team_id || "").toString());
+    const res = await submissionsService.submit(
+      problemId,
+      selectedFile,
+      (team_id || "").toString()
+    );
 
-    const response = await API.post(`${API_URL}/submissions/submit`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    // ✅ Ensure response data matches Submission type
-    return response.data as Submission;
+    return res.data as Submission;
   }
 
-  // ✅ Fixed: return Promise<void>
   async function fetchSubmissions(problemId: string): Promise<void> {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No token found");
     const decoded = jwtDecode<{ team_id: number }>(token);
 
     try {
-      const res = await API.get(
-        `${API_URL}/submissions/problem/${problemId}/team/${decoded.team_id}`
+      const res = await submissionsService.getSubmissionsByProblemAndTeam(
+        problemId,
+        decoded.team_id.toString()
       );
+
       setSubmissions(res.data);
     } catch (err) {
       console.error("Error fetching submissions:", err);

@@ -6,6 +6,7 @@ export type TeamInfo = {
   id: number;
   rank: number;
   name: string;
+  members: string;
   university: string;
   solved: number;
   problems: ProblemScroreboard[];
@@ -43,7 +44,7 @@ export const TeamProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchTeams = async () => {
     setLoading(true);
-    teamsService
+    await teamsService
       .getScoreboard()
       .then((reponse) => {
         setTeams(reponse.data);

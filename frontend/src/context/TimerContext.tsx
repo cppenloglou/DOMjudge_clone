@@ -11,7 +11,6 @@ type TimerContextType = {
   formatSeconds: (totalSeconds: number) => string;
   startTimer: (h: number, m: number) => {};
   cancelTimer: () => {};
-  loading: boolean;
 };
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -19,7 +18,6 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
 
   const { logout } = useAuth();
 
@@ -109,7 +107,6 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
         formatSeconds,
         startTimer,
         cancelTimer,
-        loading,
       }}
     >
       {children}
