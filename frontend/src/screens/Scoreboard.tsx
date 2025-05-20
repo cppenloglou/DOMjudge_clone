@@ -24,11 +24,12 @@ import {
 import { CheckCircle2, Clock, Medal, Trophy, XCircle } from "lucide-react";
 import { useProblems } from "@/context/ProblemContext";
 import { useTeams } from "@/context/TeamContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function ScoreboardPage() {
-  const { problems } = useProblems();
+  const { problems, fetchProblems, problemCount } = useProblems();
   const { teams, calculateTotalProblemsTime, fetchTeams } = useTeams();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,6 +37,25 @@ export default function ScoreboardPage() {
     }, 60000);
     return () => clearInterval(interval);
   }, [fetchTeams]);
+
+  useEffect(() => {
+    const fetchProblemsBeforeRender = async () => {
+      if (problems.length === 0 || problems === null) {
+        console.log("Fetching problems...");
+        console.log("problems: ", problems);
+        await fetchProblems(0, problemCount, "all");
+      }
+    };
+
+    setLoading(true);
+    fetchProblemsBeforeRender()
+      .catch((error) => {
+        console.error("Error fetching problems:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   // Format time (minutes) to hours and minutes
   const formatTime = (minutes: number) => {
@@ -54,6 +74,14 @@ export default function ScoreboardPage() {
         return "";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="loader"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   Dispatch,
   SetStateAction,
+  useLayoutEffect,
 } from "react";
 import { jwtDecode } from "jwt-decode";
 import { authService } from "@/services/apiServices";
@@ -49,11 +50,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
+    localStorage.getItem("token") ? localStorage.getItem("token") : null
   );
-  const [refreshToken, setRefreshToken] = useState<string | null>(
-    localStorage.getItem("refreshToken")
-  );
+
   const [role, setRoleState] = useState<RoleType>(() => {
     return (localStorage.getItem("role") as RoleType) || null;
   });
@@ -101,21 +100,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }, 60 * 1000); // check every 1 minute
 
     return () => clearInterval(interval); // cleanup
-  }, [token, refreshToken]);
+  }, [token]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) setToken(token);
+  }, []);
+
+  useLayoutEffect(() => {
+    const initializeAuth = async () => {
+      if (!token) {
+        console.log("TOKEN does not exist refreshing...");
+        try {
+          const response = await authService.refresh();
+          setToken(response.data.accessToken);
+          console.log("TOKEN set: ", response.data.accessToken);
+        } catch (error) {
+          console.warn("User is not logged in or refresh token is invalid.");
+          setToken(null);
+        }
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
 
   const refresh = () => {
     setLoading(true);
     authService
-      .refresh(refreshToken)
+      .refresh()
       .then((response) => {
         const newToken = response.data.accessToken;
-        const newRefreshToken = response.data.refreshToken;
 
         setToken(newToken);
-        setRefreshToken(newRefreshToken);
 
         localStorage.setItem("token", newToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
       })
       .catch((error) => {
         console.error("Error refreshing token:", error);
@@ -130,21 +150,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(true);
     const response = await authService
       .login(username, password)
-      .then(function (response) {
+      .then((response) => {
         setLoading(true);
         setToken(response.data.accessToken);
-        setRefreshToken(response.data.refreshToken);
         setRoleState(response.data.user.roles[0]);
 
-        if (response.data.accessToken && response.data.refreshToken) {
-          localStorage.setItem("refreshToken", response.data.refreshToken);
+        if (response.data.accessToken) {
           localStorage.setItem("token", response.data.accessToken);
           localStorage.setItem("role", response.data.user.roles[0]);
         }
 
         setLoading(false);
       })
-      .catch(function (error) {
+      .catch((error) => {
         if (
           error.response.data &&
           error.response.data === "The contest hasn't started yet!" &&
@@ -164,17 +182,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await authService.logout(refreshToken);
+      await authService.logout();
     } catch (error) {
       throw new Error("Logout failed");
     }
 
     setToken(null);
-    setRefreshToken(null);
     setRole(null);
-    localStorage.removeItem("refreshToken");
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    console.log("RUN");
   };
 
   return (
