@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useLayoutEffect(() => {
     const initializeAuth = async () => {
-      if (!token) {
+      if (!token && cookieExists("refreshToken")) {
         console.log("TOKEN does not exist refreshing...");
         try {
           const response = await authService.refresh();
@@ -125,6 +125,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     initializeAuth();
   }, []);
+
+  const cookieExists = (name: string) => {
+    return document.cookie
+      .split(";")
+      .some((cookie) => cookie.trim().startsWith(name + "="));
+  };
 
   const refresh = () => {
     setLoading(true);

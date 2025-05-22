@@ -29,6 +29,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useTimer } from "@/context/TimerContext";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { TeamInfo, useTeams } from "@/context/TeamContext";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export function Navbar() {
   const { logout } = useContext(AuthContext);
@@ -43,6 +45,18 @@ export function Navbar() {
   };
 
   const [isOpen, setIsOpen] = React.useState(false);
+  const [currentTeam, setCurrentTeam] = React.useState<TeamInfo>(
+    {} as TeamInfo
+  );
+  const { getTeam, loading } = useTeams();
+
+  React.useEffect(() => {
+    const team = getTeam();
+    if (team) {
+      setCurrentTeam(team);
+      console.log("Current Team Name:", team.name);
+    }
+  }, [currentTeam, loading]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background px-4 sm:px-6 lg:px-8">
@@ -91,30 +105,6 @@ export function Navbar() {
                     <Award className="h-4 w-4" />
                     <span>Scoreboard</span>
                   </Link>
-                  <Link
-                    to="/clarifications"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    <span>Clarifications</span>
-                  </Link>
-                  <Link
-                    to="/teams"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Users className="h-4 w-4" />
-                    <span>Teams</span>
-                  </Link>
-                  <Link
-                    to="/docs"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span>Docs</span>
-                  </Link>
                 </nav>
                 <div className="flex flex-col gap-4 pb-6">
                   <div className="flex flex-col gap-3 pl-1">
@@ -159,33 +149,6 @@ export function Navbar() {
                   <span>Scoreboard</span>
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/clarifications"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  <span>Clarifications</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/teams"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Users className="h-4 w-4" />
-                  <span>Teams</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/docs"
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <FileText className="h-4 w-4" />
-                  <span>Docs</span>
-                </Link>
-              </li>
             </ul>
           </nav>
         </div>
@@ -207,14 +170,19 @@ export function Navbar() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-2 h-9">
                 <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
-                  JS
+                  {currentTeam && currentTeam.name
+                    ? currentTeam.name.substring(0, 1).toUpperCase() +
+                      currentTeam.name
+                        .charAt(currentTeam.name.length - 1)
+                        .toUpperCase()
+                    : ""}
                 </div>
-                <span className="hidden md:inline">Team Alpha</span>
+                <span className="hidden md:inline">{currentTeam.name}</span>
                 <ChevronDown className="h-3 w-3 hidden md:inline" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Team Alpha</DropdownMenuLabel>
+              <DropdownMenuLabel>{currentTeam.name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/profile">Profile</Link>

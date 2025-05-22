@@ -35,7 +35,8 @@ export const authService = {
     
 
   refresh: () =>
-    API.post(auth_path + "/refresh", {}, { withCredentials: true }),
+    API.post(auth_path + "/refresh", {}, {
+      withCredentials: true }),
 };
 
 // Submissions Service

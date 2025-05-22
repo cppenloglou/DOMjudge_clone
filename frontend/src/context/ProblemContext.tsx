@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { usePage } from "@/context/PageContext";
 import { problemsService } from "@/services/apiServices";
@@ -45,6 +45,15 @@ export const ProblemProvider = ({
   const [problemCount, setProblemCount] = useState<number>(0);
 
   const { itemsPerPage } = usePage();
+
+  useEffect(() => {
+    const fetchProblemsBeforeRender = async () => {
+      await fetchProblems().catch((err) => {
+        console.error("Error fetching problems:", err);
+      });
+    };
+    fetchProblemsBeforeRender();
+  }, []);
 
   const getProblemById = (id: string | null): Problem | null => {
     if (!id) return null;

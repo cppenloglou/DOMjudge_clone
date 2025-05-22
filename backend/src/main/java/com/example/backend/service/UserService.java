@@ -63,8 +63,12 @@ public class UserService {
         return Map.of("accessToken", jwtToken,  "user", user, "refreshToken", refreshToken);
     }
     public Map<String, Object> refreshToken(String refreshToken) {
-        if(redisService.hasToken(refreshToken))
+        log.info("refresh token before enter redis:{}", refreshToken);
+        if(redisService.hasToken(refreshToken)){
+            log.info("Refresh token fn: {}", refreshToken);
             return null;
+        }
+
         invalidateToken(refreshToken);
         if(refreshToken != null) {
             if(jwtService.validateToken(refreshToken)) {

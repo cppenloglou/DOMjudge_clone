@@ -30,10 +30,10 @@ function App() {
 
         <Route element={<ProtectedRoutes />}>
           <Route element={<NavbarLayout />}>
-            <Route path="/" element={<Home />} />
             <Route element={<PageLayout />}>
               <Route path="/problems" element={<ProblemsPage />} />
               <Route element={<TeamLayout />}>
+                <Route path="/" element={<Home />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/scoreboard" element={<ScoreboardPage />} />
               </Route>

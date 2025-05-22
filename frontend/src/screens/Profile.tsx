@@ -26,7 +26,7 @@ interface CurrentUserTeam {
 export default function ProfilePage() {
   const { token, role } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { teams, fetchTeams, loading } = useTeams();
+  const { teams, fetchTeams, loading, getTeam } = useTeams();
   const [currentTeam, setCurrentTeam] = useState<CurrentUserTeam | null>(null);
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
 
@@ -42,33 +42,22 @@ export default function ProfilePage() {
       return;
     }
 
+    const team = getTeam();
+    const decoded = jwtDecode<MyJwtPayload>(token);
+
     if (teams.length > 0) {
-      try {
-        const decoded = jwtDecode<MyJwtPayload>(token);
-        if (decoded && decoded.team_id) {
-          const teamId = decoded.team_id;
+      if (team) {
+        setCurrentTeam({
+          name: team.name,
+          university: team.university,
+          solved: team.solved,
+          rank: team.rank,
+          email: decoded.sub,
+        });
 
-          const team = teams.find((team) => team.team_id === teamId);
-          console.log("Found team:", team);
-
-          if (team) {
-            setCurrentTeam({
-              name: team.name,
-              university: team.university,
-              solved: team.solved,
-              rank: team.rank,
-              email: decoded.sub,
-            });
-
-            setTeamMembers(
-              team.members.split(",").map((member) => member.trim())
-            );
-          } else {
-            console.log("Team not found for ID:", teamId);
-          }
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error);
+        setTeamMembers(team.members.split(",").map((member) => member.trim()));
+      } else {
+        console.log("Team not found");
       }
     }
   }, [token, teams, navigate]);

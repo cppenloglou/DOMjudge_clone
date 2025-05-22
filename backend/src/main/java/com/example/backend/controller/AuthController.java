@@ -73,7 +73,7 @@ public ResponseEntity<?> login(@RequestBody LoginDto loginDto, HttpServletRespon
 }
 
    @PostMapping("/refresh")
-public ResponseEntity<?> refreshToken(@CookieValue(name = "refreshToken", required = false) String refreshToken) {
+public ResponseEntity<?> refreshToken(@CookieValue(name = "refreshToken") String refreshToken, HttpServletResponse response) {
     logger.info("Refresh token: {}", refreshToken);
 
     if (refreshToken == null) {
@@ -82,6 +82,19 @@ public ResponseEntity<?> refreshToken(@CookieValue(name = "refreshToken", requir
 
     Map<String, Object> refreshTokenDetails = userService.refreshToken(refreshToken);
     if (refreshTokenDetails.get("accessToken") != null) {
+
+        // Create secure cookie
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshTokenDetails.get("refreshToken").toString())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Strict")
+                .maxAge(7 * 24 * 60 * 60) // 7 days
+                .build();
+
+        // Add cookie to response
+        response.addHeader("Set-Cookie", cookie.toString());
+
         return ResponseEntity.ok(refreshTokenDetails);
     }
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Refresh Token");

@@ -59,15 +59,16 @@ export default function ProblemPage() {
     }
   }, [loading]);
 
-  useEffect(() => {
-    if (!loading && id && problem) {
-      const found = getProblemById(id);
-      if (found) {
-        setProblem(found);
-        fetchSubmissions(id);
-      }
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   console.log(`Problem: ${problem} - ID: ${id} - Loading: ${loading}`);
+  //   if (!loading && id && problem) {
+  //     const found = getProblemById(id);
+  //     if (found) {
+  //       setProblem(found);
+  //       fetchSubmissions(id);
+  //     }
+  //   }
+  // }, [loading]);
 
   const handleFileUpload = async () => {
     if (!selectedFile || !problem) return;
