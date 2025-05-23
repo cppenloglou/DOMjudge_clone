@@ -31,6 +31,7 @@ services:
 
   # Executor services
   c_executor:
+    image: cppenloglou/c_executor:latest
     build:
       context: ./executors/c_executor
       dockerfile: Dockerfile-c
@@ -44,6 +45,7 @@ services:
     restart: unless-stopped
 
   cpp_executor:
+    image: cppenloglou/cpp_executor:latest
     build:
       context: ./executors/cpp_executor
       dockerfile: Dockerfile-cpp
@@ -57,6 +59,7 @@ services:
     restart: unless-stopped
 
   java_executor:
+    image: cppenloglou/java_executor:latest
     build:
       context: ./executors/java_executor
       dockerfile: Dockerfile-java
@@ -70,6 +73,7 @@ services:
     restart: unless-stopped
 
   python_executor:
+    image: cppenloglou/python_executor:latest
     build:
       context: ./executors/python_executor
       dockerfile: Dockerfile-python
@@ -84,6 +88,7 @@ services:
 
   # Backend service
   backend:
+    image: cppenloglou/backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -119,6 +124,7 @@ services:
 
   # Frontend service
   frontend:
+    image: cppenloglou/frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
