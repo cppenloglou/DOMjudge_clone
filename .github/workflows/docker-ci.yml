@@ -29,3 +29,16 @@ jobs:
 
       - name: Push Docker images
         run: VITE_APP_BASE_URL=${{ secrets.VITE_APP_BASE_URL }} docker compose -f docker-compose.yml push
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/DOMjudge_clone
+            git pull origin main
+            VITE_APP_BASE_URL=${{ secrets.VITE_APP_BASE_URL }} docker compose -f docker-compose.yml pull
+            VITE_APP_BASE_URL=${{ secrets.VITE_APP_BASE_URL }} docker compose -f docker-compose.yml down
+            VITE_APP_BASE_URL=${{ secrets.VITE_APP_BASE_URL }} docker compose -f docker-compose.yml up -d
