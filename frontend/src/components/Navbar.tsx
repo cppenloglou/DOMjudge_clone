@@ -1,17 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Award,
-  ChevronDown,
-  Clock,
-  Code,
-  FileText,
-  Menu,
-  MessageSquare,
-  Users,
-  LogOut,
-} from "lucide-react";
+import { Award, ChevronDown, Clock, Code, Menu, LogOut } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +20,6 @@ import { useTimer } from "@/context/TimerContext";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { TeamInfo, useTeams } from "@/context/TeamContext";
-import { LoadingSpinner } from "./LoadingSpinner";
 
 export function Navbar() {
   const { logout } = useContext(AuthContext);
