@@ -115,7 +115,7 @@ services:
       - DOCKER_C_EXECUTOR_PORT=8000
       - DOCKER_PYTHON_EXECUTOR_PORT=8000
       - DOCKER_JAVA_EXECUTOR_PORT=8000
-      - FRONTEND_BASE_URL=http://localhost:3000
+      - FRONTEND_BASE_URL=http://ec2-63-176-145-39.eu-central-1.compute.amazonaws.com:3000
     networks:
       - backend_network
       - executor_network
