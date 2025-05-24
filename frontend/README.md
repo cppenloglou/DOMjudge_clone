@@ -1,54 +1,89 @@
-# React + TypeScript + Vite
+# DOMjudge Clone Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for the DOMjudge Clone project, built with **React**, **TypeScript**, and **Vite**. It provides a modern, responsive interface for programming contest management, including user authentication, problem viewing, submissions, team management, and a live scoreboard.
 
-Currently, two official plugins are available:
+## Project Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **src/components/**: Reusable UI components (e.g., `Navbar`, `LoadingSpinner`, and UI elements)
+- **src/layouts/**: Page and section layouts for consistent structure (e.g., `NavBarLayout`, `PageLayout`)
+- **src/context/**: React Contexts for global state (e.g., `AuthContext`, `ProblemContext`, `TeamContext`, etc.)
+- **src/screens/**: Main application pages (e.g., `Home`, `Login`, `Register`, `Problems`, `ProblemPage`, `AdminPage`, `Scoreboard`, `Profile`)
+- **src/services/**: API service modules for backend communication (`api.ts`, `apiServices.ts`)
+- **src/utils/**: Utility functions and route protection (`AdminRoute`, `ProtectedRoutes`)
+- **public/**: Static assets
 
-## Expanding the ESLint configuration
+## Key Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Authentication**: Login, registration, and protected routes
+- **Problem Management**: View problems, problem details, and submit solutions
+- **Submissions**: Track and view submission status
+- **Teams**: Team management and context
+- **Scoreboard**: Live contest scoreboard
+- **Admin Tools**: Admin-only routes and pages
+- **Responsive UI**: Modern, user-friendly interface
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- npm or yarn
+
+### Installation
+
+```bash
+cd frontend
+npm install
+# or
+yarn install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm run dev
+# or
+yarn dev
 ```
+
+The app will be available at `http://localhost:5173` by default.
+
+### Linting & Formatting
+
+- ESLint is configured for TypeScript and React. Run:
+
+```bash
+npm run lint
+```
+
+- You can expand ESLint rules in `eslint.config.js` as needed.
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+## Customization & Extending
+
+- Add new pages in `src/screens/`
+- Add new context providers in `src/context/`
+- Add or update API calls in `src/services/`
+- Add new layouts in `src/layouts/`
+
+## Project Architecture
+
+- **State Management**: Uses React Context for authentication, problems, teams, submissions, roles, and timers.
+- **Routing**: Protected and admin routes via custom utilities.
+- **API Communication**: All backend calls are abstracted in the `services` layer.
+- **Component-Driven**: UI is built from modular, reusable components.
+
+## Contributing
+
+1. Fork the repo and create your branch
+2. Make your changes
+3. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
