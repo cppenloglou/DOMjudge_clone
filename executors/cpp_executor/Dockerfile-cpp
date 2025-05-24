@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Install G++ for C++ compilation
-RUN apt-get update && apt-get install -y g++
+RUN apt-get update && apt-get install -y g++ && apt-get install -y curl
 
 # Install dependencies for FastAPI
 RUN pip install fastapi uvicorn python-multipart

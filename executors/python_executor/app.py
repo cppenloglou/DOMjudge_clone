@@ -35,6 +35,36 @@ def create_standard_response(problemID, status, message, testcase_index=0, expec
     print("Response:", response)
     return response
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Docker health checks and monitoring"""
+    try:
+        # Check if problems directory exists and is accessible
+        if not os.path.exists(PROBLEMS_DIR):
+            return {"status": "unhealthy", "error": "Problems directory not found"}
+        
+        # Check if we can list the directory
+        os.listdir(PROBLEMS_DIR)
+        
+        # Check if Python interpreter is available
+        result = subprocess.run(
+            ["python3", "--version"],
+            capture_output=True,
+            text=True,
+            timeout=1
+        )
+        if result.returncode != 0:
+            return {"status": "unhealthy", "error": "Python interpreter not available"}
+        
+        return {
+            "status": "healthy",
+            "service": "python_executor",
+            "problems_dir": PROBLEMS_DIR,
+            "python_version": result.stdout.strip()
+        }
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
+
 @app.post("/execute")
 def run_python_script(
     problemID: str = Form(...),

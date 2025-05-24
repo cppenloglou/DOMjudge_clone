@@ -73,7 +73,7 @@ export default function ScoreboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 container py-8 px-6 sm:px-8 md:px-10">
+      <main className="flex-1 container py-6 px-6 sm:px-8 md:px-10">
         <div className="flex flex-col gap-6 max-w-7xl mx-auto">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight">Scoreboard</h1>
@@ -93,7 +93,7 @@ export default function ScoreboardPage() {
                 {teams.length}
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-0">
               <div className="overflow-x-auto">
                 {loading ? (
                   <LoadingSpinner />

@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Install GCC for C compilation
-RUN apt-get update && apt-get install -y gcc
+RUN apt-get update && apt-get install -y gcc && apt-get install -y curl
 
 # Install dependencies for FastAPI
 RUN pip install fastapi uvicorn python-multipart

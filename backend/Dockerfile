@@ -16,6 +16,8 @@ RUN mvn package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+RUN apk add --no-cache curl
+
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=prod
 

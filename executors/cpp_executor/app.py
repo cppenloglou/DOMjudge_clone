@@ -36,6 +36,84 @@ def create_standard_response(problemID, status, message, testcase_index=None, ex
     print("Response:", response)
     return response
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Docker health checks and monitoring"""
+    try:
+        # Check if problems directory exists and is accessible
+        if not os.path.exists(PROBLEMS_DIR):
+            return {"status": "unhealthy", "error": "Problems directory not found"}
+        
+        # Check if we can list the directory
+        os.listdir(PROBLEMS_DIR)
+        
+        # Check if g++ compiler is available
+        gpp_result = subprocess.run(
+            ["g++", "--version"],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        if gpp_result.returncode != 0:
+            return {"status": "unhealthy", "error": "g++ compiler not available"}
+        
+        # Test compilation with a simple C++ program
+        test_cpp = """
+#include <iostream>
+int main() {
+    std::cout << "test" << std::endl;
+    return 0;
+}
+"""
+        test_file = "/tmp/health_test.cpp"
+        test_executable = "/tmp/health_test"
+        
+        try:
+            # Write test file
+            with open(test_file, "w") as f:
+                f.write(test_cpp)
+            
+            # Try to compile
+            compile_result = subprocess.run(
+                ["g++", test_file, "-o", test_executable],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            
+            if compile_result.returncode != 0:
+                return {"status": "unhealthy", "error": "g++ compilation test failed"}
+            
+            # Try to execute
+            exec_result = subprocess.run(
+                [test_executable],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            
+            if exec_result.returncode != 0 or exec_result.stdout.strip() != "test":
+                return {"status": "unhealthy", "error": "g++ execution test failed"}
+                
+        finally:
+            # Cleanup test files
+            for file_path in [test_file, test_executable]:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+        
+        # Extract g++ version
+        gcc_version = gpp_result.stdout.split('\n')[0] if gpp_result.stdout else "Unknown"
+        
+        return {
+            "status": "healthy",
+            "service": "cpp_executor",
+            "problems_dir": PROBLEMS_DIR,
+            "compiler_version": gcc_version.strip(),
+            "temp_dir_writable": os.access("/tmp", os.W_OK)
+        }
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
+
 @app.post("/execute")
 def run_cpp_script(
     problemID: str = Form(...),

@@ -1,33 +1,41 @@
-version: "3.8"
-
 services:
   # Database services
   postgres:
-    image: "postgres:latest"
+    image: postgres:16-alpine
     environment:
-      - "POSTGRES_DB=mydatabase"
-      - "POSTGRES_PASSWORD=secret"
-      - "POSTGRES_USER=myuser"
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      my_custom_network:
-        ipv4_address: 172.30.0.2
-      backend_network:
+      - backend_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
 
   redis:
-    image: "redis:latest"
+    image: redis:7-alpine
     ports:
       - "6379:6379"
-    command: redis-server --timeout 60 --databases 1
+    command: redis-server --timeout 60 --databases 1 --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     networks:
       - backend_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   # Executor services
   c_executor:
@@ -38,11 +46,16 @@ services:
     ports:
       - "5003:8000"
     volumes:
-      - ./executors/c_executor/problems:/app/problems
+      - ./executors/c_executor/problems:/app/problems:ro
     networks:
       - executor_network
-      - backend_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   cpp_executor:
     image: cppenloglou/cpp_executor:latest
@@ -52,11 +65,16 @@ services:
     ports:
       - "5001:8000"
     volumes:
-      - ./executors/cpp_executor/problems:/app/problems
+      - ./executors/cpp_executor/problems:/app/problems:ro
     networks:
       - executor_network
-      - backend_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   java_executor:
     image: cppenloglou/java_executor:latest
@@ -66,11 +84,16 @@ services:
     ports:
       - "5004:8000"
     volumes:
-      - ./executors/java_executor/problems:/app/problems
+      - ./executors/java_executor/problems:/app/problems:ro
     networks:
       - executor_network
-      - backend_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   python_executor:
     image: cppenloglou/python_executor:latest
@@ -80,14 +103,20 @@ services:
     ports:
       - "5002:8000"
     volumes:
-      - ./executors/python_executor/problems:/app/problems
+      - ./executors/python_executor/problems:/app/problems:ro
     networks:
       - executor_network
-      - backend_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # Backend service
   backend:
+    container_name: backend
     image: cppenloglou/backend:latest
     build:
       context: ./backend
@@ -95,12 +124,18 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - redis
-      - c_executor
-      - cpp_executor
-      - python_executor
-      - java_executor
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      c_executor:
+        condition: service_healthy
+      cpp_executor:
+        condition: service_healthy
+      python_executor:
+        condition: service_healthy
+      java_executor:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase
       - SPRING_DATASOURCE_USERNAME=myuser
@@ -115,41 +150,56 @@ services:
       - DOCKER_C_EXECUTOR_PORT=8000
       - DOCKER_PYTHON_EXECUTOR_PORT=8000
       - DOCKER_JAVA_EXECUTOR_PORT=8000
-      - FRONTEND_BASE_URL=http://ec2-63-176-145-39.eu-central-1.compute.amazonaws.com:3000
+      - FRONTEND_BASE_URL=http://localhost:3000
     networks:
       - backend_network
       - executor_network
-      - my_custom_network
     restart: unless-stopped
+    healthcheck:
+      test:
+        ["CMD", "curl", "-f", "http://localhost:8080/api/v1/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Frontend service
   frontend:
+    container_name: frontend
     image: cppenloglou/frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_APP_BASE_URL: ${VITE_APP_BASE_URL}
+        VITE_APP_BASE_URL: ${VITE_APP_BASE_URL:-http://localhost:8080}
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - backend_network
     restart: unless-stopped
+
+  # Watchtower service to auto-update backend and frontend
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --interval 30 backend frontend
+    networks:
+      - backend_network
 
 networks:
   backend_network:
     driver: bridge
   executor_network:
     driver: bridge
-  my_custom_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.30.0.0/24
-          gateway: 172.30.0.1
 
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local

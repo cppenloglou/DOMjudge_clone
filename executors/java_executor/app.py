@@ -36,6 +36,49 @@ def create_standard_response(problemID, status, message, testcase_index=None, ex
     print("Response:", response)
     return response
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Docker health checks and monitoring"""
+    try:
+        # Check if problems directory exists and is accessible
+        if not os.path.exists(PROBLEMS_DIR):
+            return {"status": "unhealthy", "error": "Problems directory not found"}
+        
+        # Check if we can list the directory
+        os.listdir(PROBLEMS_DIR)
+        
+        # Check if Java compiler is available
+        javac_result = subprocess.run(
+            ["javac", "-version"],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        if javac_result.returncode != 0:
+            return {"status": "unhealthy", "error": "Java compiler (javac) not available"}
+        
+        # Check if Java runtime is available
+        java_result = subprocess.run(
+            ["java", "-version"],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        if java_result.returncode != 0:
+            return {"status": "unhealthy", "error": "Java runtime not available"}
+        
+        # Extract Java version from stderr (Java outputs version to stderr)
+        java_version = java_result.stderr.split('\n')[0] if java_result.stderr else "Unknown"
+        
+        return {
+            "status": "healthy",
+            "service": "java_executor",
+            "problems_dir": PROBLEMS_DIR,
+            "java_version": java_version.strip(),
+            "temp_dir_writable": os.access("/tmp", os.W_OK)
+        }
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
 
 @app.post("/execute")
 def run_java_script(
