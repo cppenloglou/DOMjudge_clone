@@ -59,17 +59,6 @@ export default function ProblemPage() {
     }
   }, [loading]);
 
-  // useEffect(() => {
-  //   console.log(`Problem: ${problem} - ID: ${id} - Loading: ${loading}`);
-  //   if (!loading && id && problem) {
-  //     const found = getProblemById(id);
-  //     if (found) {
-  //       setProblem(found);
-  //       fetchSubmissions(id);
-  //     }
-  //   }
-  // }, [loading]);
-
   const handleFileUpload = async () => {
     if (!selectedFile || !problem) return;
     const res = await submit(problem.id, selectedFile);

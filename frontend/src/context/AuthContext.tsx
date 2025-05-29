@@ -114,7 +114,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         try {
           const response = await authService.refresh();
           setToken(response.data.accessToken);
-          console.log("TOKEN set: ", response.data.accessToken);
         } catch (error) {
           console.warn("User is not logged in or refresh token is invalid.");
           setToken(null);

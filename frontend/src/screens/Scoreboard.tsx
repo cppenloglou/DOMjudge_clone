@@ -41,13 +41,10 @@ export default function ScoreboardPage() {
   useEffect(() => {
     const fetchProblemsBeforeRender = async () => {
       if (problems.length <= problemCount) {
-        console.log("Fetching problems...");
-        console.log("problems: ", problems);
         await fetchProblems();
       }
     };
 
-    console.log("Before");
     fetchProblemsBeforeRender().catch((error) => {
       console.error("Error fetching problems:", error);
     });

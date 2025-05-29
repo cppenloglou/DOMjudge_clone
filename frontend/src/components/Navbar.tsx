@@ -43,7 +43,6 @@ export function Navbar() {
     const team = getTeam();
     if (team) {
       setCurrentTeam(team);
-      console.log("Current Team Name:", team.name);
     }
   }, [currentTeam, loading]);
 
