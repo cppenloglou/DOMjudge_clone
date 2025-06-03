@@ -1,22 +1,29 @@
-🔁 Problem 7: Reverse Linked List
-📘 Overview
+## 📘 Overview
 Reversing a linked list is a foundational algorithm in data structures. This task involves modifying the next pointers of each node so that the list points in the opposite direction.
 
-❓ Problem Statement
+## ❓ Problem Statement
 Given the head of a singly linked list, reverse the list and return the new head.
 
-🧾 Constraints
-The number of nodes is in the range [0, 5000].
+## 🧾 Constraints
+- The number of nodes is in the range [0, 5000].
+- Each node’s value is an integer.
 
-Each node’s value is an integer.
+## 🧪 Examples
 
-🧪 Examples
-Example 1:
+### Example 1:
 
-Input: [1, 2, 3, 4, 5]
-Output: [5, 4, 3, 2, 1]
+**Input:**  
+[1, 2, 3, 4, 5]
 
-Example 2:
+**Output:**  
+[5, 4, 3, 2, 1]
 
-Input: [1, 2]
-Output: [2, 1]
+---
+
+### Example 2:
+
+**Input:**  
+[1, 2]
+
+**Output:**  
+[2, 1]

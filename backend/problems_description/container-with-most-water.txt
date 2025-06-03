@@ -1,29 +1,36 @@
-🧪 Problem 3: Container With Most Water
-📘 Overview
+## 📘 Overview
 You are given an array of non-negative integers where each value represents a vertical line on the x-axis. These lines form containers with the x-axis. Your task is to find the two lines that together with the x-axis can contain the most water.
 
-❓ Problem Statement
+## ❓ Problem Statement
 You must choose two lines that, when combined with the x-axis, form a container. The area of water it can contain is limited by the shorter of the two lines and the distance between them. Return the maximum amount of water that can be trapped.
 
-🧾 Constraints
-The array length is at least 2 and at most 10⁵.
+## 🧾 Constraints
+- The array length is at least 2 and at most 10⁵.
+- Each height value is a non-negative integer ≤ 10⁴.
 
-Each height value is a non-negative integer ≤ 10⁴.
+## 🧪 Examples
 
-🧪 Examples
-Example 1:
+### Example 1:
 
-Input: [1,8,6,2,5,4,8,3,7]
-Output: 49
+**Input:**  
+[1,8,6,2,5,4,8,3,7]
 
-Explanation:
-The lines at index 1 and 8 form the container with max area:
+**Output:**  
+49
+
+**Explanation:**  
+The lines at index 1 and 8 form the container with max area:  
 min(8,7) * (8-1) = 7 * 7 = 49
 
-Example 2:
+---
 
-Input: [1,1]
-Output: 1
+### Example 2:
 
-Explanation:
+**Input:**  
+[1,1]
+
+**Output:**  
+1
+
+**Explanation:**  
 Only one possible container with height 1 and width 1.

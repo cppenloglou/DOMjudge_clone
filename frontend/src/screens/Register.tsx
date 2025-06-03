@@ -27,7 +27,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Accordion,
   AccordionContent,
@@ -477,29 +476,6 @@ export default function RegisterPage() {
             </Accordion>
 
             <CardFooter className="flex flex-col space-y-4 px-6 pb-6">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="terms" />
-                <Label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  I agree to the{" "}
-                  <Link
-                    to="/terms"
-                    className="text-primary underline-offset-4 hover:underline"
-                  >
-                    terms of service
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    to="/privacy"
-                    className="text-primary underline-offset-4 hover:underline"
-                  >
-                    privacy policy
-                  </Link>
-                </Label>
-              </div>
-
               <div className="flex flex-col sm:flex-row gap-4 w-full">
                 <Button variant="outline" className="sm:flex-1" asChild>
                   <Link to="/login">Already have an account? Login</Link>

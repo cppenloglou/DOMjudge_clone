@@ -1,26 +1,35 @@
-💎 Problem 4: Longest Palindromic Substring
-📘 Overview
+## 📘 Overview
 A palindrome is a string that reads the same forwards and backwards. Your task is to find the longest palindromic substring in a given string.
 
-❓ Problem Statement
+## ❓ Problem Statement
 Given a string s, return the longest contiguous substring within it that is also a palindrome. If multiple solutions exist, you may return any of them.
 
-🧾 Constraints
-1 <= s.length <= 1000
+## 🧾 Constraints
+- 1 <= s.length <= 1000
+- s consists of only printable ASCII characters.
 
-s consists of only printable ASCII characters.
+## 🧪 Examples
 
-🧪 Examples
-Example 1:
+### Example 1:
 
-Input: "babad"
-Output: "bab"
+**Input:**  
+"babad"
 
-Explanation: "aba" is also a valid answer, as both are of equal length.
+**Output:**  
+"bab"
 
-Example 2:
+**Explanation:**  
+"aba" is also a valid answer, as both are of equal length.
 
-Input: "cbbd"
-Output: "bb"
+---
 
-Explanation: "bb" is the only palindromic substring longer than one character.
+### Example 2:
+
+**Input:**  
+"cbbd"
+
+**Output:**  
+"bb"
+
+**Explanation:**  
+"bb" is the only palindromic substring longer than one character.

@@ -15,6 +15,8 @@ import { useEffect, useState } from "react";
 import { usePage } from "@/context/PageContext";
 import { useProblems } from "@/context/ProblemContext";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function ProblemsPage() {
   const [filter, setFilter] = useState<"all" | "solved" | "unsolved">("all");
@@ -103,11 +105,14 @@ export default function ProblemsPage() {
                               </div>
 
                               <p className="text-sm text-muted-foreground line-clamp-3 mb-3 flex-grow">
-                                {problem.description}
+                                <ReactMarkdown
+                                  children={problem.description}
+                                  remarkPlugins={[remarkGfm]}
+                                />
                               </p>
 
                               <div className="mt-auto">
-                                {problem.status && (
+                                {problem.status ? (
                                   <Badge
                                     variant="outline"
                                     className={
@@ -117,6 +122,13 @@ export default function ProblemsPage() {
                                     }
                                   >
                                     {problem.status}
+                                  </Badge>
+                                ) : (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-muted-foreground"
+                                  >
+                                    Not Attempted
                                   </Badge>
                                 )}
                               </div>

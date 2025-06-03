@@ -1,0 +1,24 @@
+{
+  "testcases": [
+    {
+      "input": "()",
+      "output": "True"
+    },
+    {
+      "input": "([)]",
+      "output": "False"
+    },
+    {
+      "input": "()[]{}",
+      "output": "True"
+    },
+    {
+      "input": "(",
+      "output": "False"
+    },
+    {
+      "input": "([])",
+      "output": "True"
+    }
+  ]
+}

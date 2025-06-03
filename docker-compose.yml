@@ -181,17 +181,6 @@ services:
       - backend_network
     restart: unless-stopped
 
-  # Watchtower service to auto-update backend and frontend
-  watchtower:
-    image: containrrr/watchtower:latest
-    container_name: watchtower
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --cleanup --interval 30 backend frontend
-    networks:
-      - backend_network
-
 networks:
   backend_network:
     driver: bridge
