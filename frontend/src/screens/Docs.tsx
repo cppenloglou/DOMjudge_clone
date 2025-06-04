@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
@@ -22,9 +21,7 @@ import {
   BookOpen,
   Clock,
   Code,
-  FileText,
   HelpCircle,
-  Search,
   Shield,
   Trophy,
   Upload,
@@ -33,7 +30,6 @@ import {
 } from "lucide-react";
 
 export default function DocsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [activeLanguage, setActiveLanguage] = useState("python");
 
   const quickLinks = [
