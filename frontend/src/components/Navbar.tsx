@@ -1,7 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Award, ChevronDown, Clock, Code, Menu, LogOut } from "lucide-react";
+import {
+  Award,
+  ChevronDown,
+  Clock,
+  Code,
+  Menu,
+  LogOut,
+  FileText,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -93,6 +101,14 @@ export function Navbar() {
                     <Award className="h-4 w-4" />
                     <span>Scoreboard</span>
                   </Link>
+                  <Link
+                    to="/docs"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <FileText className="h-4 w-4" />
+                    <span>Docs</span>
+                  </Link>
                 </nav>
                 <div className="flex flex-col gap-4 pb-6">
                   <div className="flex flex-col gap-3 pl-1">
@@ -135,6 +151,15 @@ export function Navbar() {
                 >
                   <Award className="h-4 w-4" />
                   <span>Scoreboard</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/docs"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>Docs</span>
                 </Link>
               </li>
             </ul>

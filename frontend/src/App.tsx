@@ -6,6 +6,7 @@ import PageLayout from "./layouts/PageLayout";
 import SubmissionLayout from "./layouts/SubmissionLayout";
 import NavbarLayout from "./layouts/NavBarLayout";
 import TeamLayout from "./layouts/TeamLayout";
+import DocsPage from "./screens/Docs";
 
 const Home = lazy(() => import("./screens/Home"));
 const Login = lazy(() => import("./screens/Login"));
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/problems" element={<ProblemsPage />} />
                 <Route element={<TeamLayout />}>
                   <Route path="/" element={<Home />} />
+                  <Route path="/docs" element={<DocsPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/scoreboard" element={<ScoreboardPage />} />
                 </Route>

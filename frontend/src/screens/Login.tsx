@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Award } from "lucide-react";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { toast, Toaster } from "sonner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -27,18 +28,18 @@ export default function LoginPage() {
     // Validate email format
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
+      toast.warning("Please enter a valid email address.", {});
       return;
     }
     if (!password || password.trim().length === 0) {
-      alert("Password cannot be empty.");
+      toast.warning("Password cannot be empty.", {});
       return;
     }
     try {
       await login(email, password);
       navigate("/", { replace: true });
     } catch (err) {
-      alert(err);
+      toast.error(err?.toLocaleString(), {});
       console.error("ERR", err);
     }
   };
@@ -107,6 +108,12 @@ export default function LoginPage() {
           </CardFooter>
         </Card>
       </div>
+      <Toaster
+        position="bottom-right"
+        richColors
+        expand={false}
+        duration={4000}
+      />
     </div>
   );
 }
