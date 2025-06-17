@@ -32,7 +32,7 @@ DOMjudge_clone is an automated system for running programming contests, supporti
 ```bash
 git clone <this-repo-url>
 cd DOMjudge_clone
-docker-compose up --build
+docker-compose up --pull
 ```
 
 - Frontend: [http://localhost:3000](http://localhost:3000)
